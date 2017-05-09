@@ -1,0 +1,7 @@
+/gen/
+/bin/
+/node_modules/
+
+/.project
+/.externalToolBuilders/
+.DS_Store
