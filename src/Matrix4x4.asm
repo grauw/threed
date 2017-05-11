@@ -28,6 +28,126 @@ ScaleMatrix4x4: MACRO ?x = 0, ?y = 0, ?z = 0
 	Matrix4x4 ?x, 0, 0, 0, 0, ?y, 0, 0, 0, 0, ?z, 0, 0, 0, 0, 100H
 	ENDM
 
+; iy = matrix
+; ix = this
+Matrix4x4_Multiply:
+	ld bc,Vector4.w
+	add iy,bc
+	ld bc,Matrix4x4.row3 - Matrix4x4.row0
+	add ix,bc
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	ld bc,Vector4.w
+	add iy,bc
+	ld bc,Matrix4x4.row2 - Matrix4x4.row3
+	add ix,bc
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	ld bc,Vector4.w
+	add iy,bc
+	ld bc,Matrix4x4.row1 - Matrix4x4.row2
+	add ix,bc
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	ld bc,Vector4.w
+	add iy,bc
+	ld bc,Matrix4x4.row0 - Matrix4x4.row1
+	add ix,bc
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	dec iy
+	dec iy
+	call Matrix4x4_MultiplyRowColumn
+	push hl
+	ld hl,0
+	add hl,sp
+	ld e,ixl
+	ld d,ixh
+	REPT 4 * 4 * 2  ; Matrix4x4._size
+	ldi
+	ENDM
+	ld sp,hl
+	ret
+
+; iy = other matrix column
+; ix = this matrix row
+; hl <- dot product
+Matrix4x4_MultiplyRowColumn:
+	ld c,(ix + Vector4.x)
+	ld b,(ix + Vector4.x + 1)
+	ld l,(iy + Matrix4x4.row0)
+	ld h,(iy + Matrix4x4.row0 + 1)
+	call Math_MultiplySigned8_8x8_8
+	push hl
+	ld c,(ix + Vector4.y)
+	ld b,(ix + Vector4.y + 1)
+	ld l,(iy + Matrix4x4.row1)
+	ld h,(iy + Matrix4x4.row1 + 1)
+	call Math_MultiplySigned8_8x8_8
+	push hl
+	ld c,(ix + Vector4.z)
+	ld b,(ix + Vector4.z + 1)
+	ld l,(iy + Matrix4x4.row2)
+	ld h,(iy + Matrix4x4.row2 + 1)
+	call Math_MultiplySigned8_8x8_8
+	push hl
+	ld c,(ix + Vector4.w)
+	ld b,(ix + Vector4.w + 1)
+	ld l,(iy + Matrix4x4.row3)
+	ld h,(iy + Matrix4x4.row3 + 1)
+	call Math_MultiplySigned8_8x8_8
+	pop de
+	add hl,de
+	pop de
+	add hl,de
+	pop de
+	add hl,de
+	ret
+
 ; iy = vector
 ; ix = this
 Matrix4x4_MultiplyVector4:

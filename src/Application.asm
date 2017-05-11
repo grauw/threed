@@ -53,7 +53,13 @@ Application_EnterMainLoop:
 ; ix = this
 Application_MainLoop:
 	push ix
-	ld ix,Application_projection
+	ld ix,Application_mvp
+	ld iy,Application_projection
+	call Matrix4x4_Multiply
+	pop ix
+
+	push ix
+	ld ix,Application_mvp
 	ld iy,Application_vertices
 	ld bc,Application_vertices_COUNT
 	call Matrix4x4_MultiplyVector4Array
@@ -91,5 +97,8 @@ Application_projection:
 	             0H,   40H,    0H,   6AH,
 	             0H,    0H,   40H,    0H,
 	             0H,    0H,    0H,  100H
+
+Application_mvp:
+	IdentityMatrix4x4
 
 	ENDS
