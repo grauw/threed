@@ -4,6 +4,53 @@
 PointRenderer: MACRO
 	ENDM
 
+; bc = count
+; ix = vector array
+PointRenderer_PerspectiveDivideArray: PROC
+	dec bc  ; 16-bit to 2x 8-bit loop
+	inc b
+	inc c
+	ld a,b
+	ld b,c
+	ld c,a
+Loop:
+	push bc
+	ld e,(ix + Vector4.w)
+	ld d,(ix + Vector4.w + 1)
+	ld c,(ix + Vector4.x)
+	ld b,(ix + Vector4.x + 1)
+	call Math_DivideSigned8_8x8_8
+	ld hl,100H
+	add hl,bc
+	sra h
+	rr l
+	ld (ix + Vector4.x),l
+	ld (ix + Vector4.x + 1),h
+	ld c,(ix + Vector4.y)
+	ld b,(ix + Vector4.y + 1)
+	call Math_DivideSigned8_8x8_8
+	ld hl,0D4H
+	add hl,bc
+	sra h
+	rr l
+	ld (ix + Vector4.y),l
+	ld (ix + Vector4.y + 1),h
+	ld c,(ix + Vector4.z)
+	ld b,(ix + Vector4.z + 1)
+	call Math_DivideSigned8_8x8_8
+	ld (ix + Vector4.z),c
+	ld (ix + Vector4.z + 1),b
+	ld (ix + Vector4.w),0
+	ld (ix + Vector4.w + 1),1
+	ld bc,Vector4._size
+	add ix,bc
+	pop bc
+	djnz Loop
+	dec c
+	jr nz,Loop
+	ret
+	ENDP
+
 ; ix = vertices
 ; bc = count
 PointRenderer_Draw: PROC

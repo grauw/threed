@@ -60,9 +60,27 @@ Application_MainLoop:
 
 	push ix
 	ld ix,Application_mvp
+	ld iy,Application_view
+	call Matrix4x4_Multiply
+	pop ix
+
+	push ix
+	ld ix,Application_mvp
+	ld iy,Application_model
+	call Matrix4x4_Multiply
+	pop ix
+
+	push ix
+	ld ix,Application_mvp
 	ld iy,Application_vertices
 	ld bc,Application_vertices_COUNT
 	call Matrix4x4_MultiplyVector4Array
+	pop ix
+
+	push ix
+	ld ix,Application_vertices
+	ld bc,Application_vertices_COUNT
+	call PointRenderer_PerspectiveDivideArray
 	pop ix
 
 	push ix
@@ -92,11 +110,23 @@ Application_vertices:
 
 Application_vertices_COUNT: equ 8
 
-Application_projection:
-	Matrix4x4   40H,    0H,    0H,   80H,
-	             0H,   40H,    0H,   6AH,
-	             0H,    0H,   40H,    0H,
+Application_model:
+	Matrix4x4  100H,    0H,    0H,    0H,
+	             0H,  100H,    0H,    0H,
+	             0H,    0H,  100H,    0H,
 	             0H,    0H,    0H,  100H
+
+Application_view:
+	Matrix4x4  100H,    0H,    0H,    0H,
+	             0H,  100H,    0H,    0H,
+	             0H,    0H,  100H,  100H,
+	             0H,    0H,    0H,  100H
+
+Application_projection:
+	Matrix4x4   40H,    0H,    0H,    0H,
+	             0H,   40H,    0H,    0H,
+	             0H,    0H,   40H,   20H,
+	             0H,    0H,  100H,  100H
 
 Application_mvp:
 	IdentityMatrix4x4
