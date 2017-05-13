@@ -294,3 +294,79 @@ NegativeBoth:
 	call Math_Divide8_8xNegated8_8
 	ret
 	ENDP
+
+; bc = dividend
+; de = divisor
+; bc <- quotient
+; hl <- remainder
+; Modifies: af
+Math_Reciprocal8_8: PROC
+	ld hl,1
+	REPT 8
+	add hl,hl
+	sbc hl,de
+	jr nc,NoRestore
+	add hl,de
+NoRestore:
+	rla
+	ENDM
+	cpl
+	ld b,a
+	REPT 8
+	add hl,hl
+	sbc hl,de
+	jr nc,NoRestore
+	add hl,de
+NoRestore:
+	rla
+	ENDM
+	cpl
+	ld c,a
+	ret
+	ENDP
+
+; de = divisor
+; bc <- quotient
+; hl <- remainder
+; Modifies: af
+Math_ReciprocalNegated8_8: PROC
+	ld hl,1
+	REPT 8
+	add hl,hl
+	add hl,de
+	jr c,NoRestore
+	sbc hl,de
+NoRestore:
+	rla
+	ENDM
+	ld b,a
+	REPT 8
+	add hl,hl
+	add hl,de
+	jr c,NoRestore
+	sbc hl,de
+NoRestore:
+	rla
+	ENDM
+	ld c,a
+	ret
+	ENDP
+
+; de = divisor
+; bc <- quotient
+; Modifies: af, hl
+Math_ReciprocalSigned8_8:
+	bit 7,d
+	jp z,Math_Reciprocal8_8
+	call Math_ReciprocalNegated8_8
+	xor a
+	sub c  ; negate bc
+	ld c,a
+	sbc a,a
+	sub b
+	ld b,a
+	ld a,h  ; fix rounding
+	or l
+	ret z
+	dec bc
+	ret

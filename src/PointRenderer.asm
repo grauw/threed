@@ -17,29 +17,34 @@ Loop:
 	push bc
 	ld e,(ix + Vector4.w)
 	ld d,(ix + Vector4.w + 1)
-	ld c,(ix + Vector4.x)
-	ld b,(ix + Vector4.x + 1)
-	call Math_DivideSigned8_8x8_8
-	ld hl,100H
+	call Math_ReciprocalSigned8_8
+	push bc
+	ld l,(ix + Vector4.x)
+	ld h,(ix + Vector4.x + 1)
+	call Math_MultiplySigned8_8x8_8
+	ld bc,100H
 	add hl,bc
 	sra h
 	rr l
 	ld (ix + Vector4.x),l
 	ld (ix + Vector4.x + 1),h
-	ld c,(ix + Vector4.y)
-	ld b,(ix + Vector4.y + 1)
-	call Math_DivideSigned8_8x8_8
-	ld hl,0D4H
+	pop bc
+	push bc
+	ld l,(ix + Vector4.y)
+	ld h,(ix + Vector4.y + 1)
+	call Math_MultiplySigned8_8x8_8
+	ld bc,0D4H
 	add hl,bc
 	sra h
 	rr l
 	ld (ix + Vector4.y),l
 	ld (ix + Vector4.y + 1),h
-	ld c,(ix + Vector4.z)
-	ld b,(ix + Vector4.z + 1)
-	call Math_DivideSigned8_8x8_8
-	ld (ix + Vector4.z),c
-	ld (ix + Vector4.z + 1),b
+	pop bc
+	ld l,(ix + Vector4.z)
+	ld h,(ix + Vector4.z + 1)
+	call Math_MultiplySigned8_8x8_8
+	ld (ix + Vector4.z),l
+	ld (ix + Vector4.z + 1),h
 	ld (ix + Vector4.w),0
 	ld (ix + Vector4.w + 1),1
 	ld bc,Vector4._size
