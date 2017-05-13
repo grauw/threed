@@ -4,7 +4,29 @@
 PointRenderer: MACRO
 	page:
 		db 0
+	drawCommand:
+		VDPCommand 0, 0, 0, 0, 0, 0, 15, 0, VDPCommand_PSET | VDPCommand_IMP
+	clearCommand:
+		VDPCommand 0, 0, 0, 0, 256, 212, 0, 0, VDPCommand_HMMV | VDPCommand_IMP
 	ENDM
+
+; ix = this
+; hl <- point command
+PointRenderer_GetDrawCommand:
+	ld e,ixl
+	ld d,ixh
+	ld hl,PointRenderer.drawCommand
+	add hl,de
+	ret
+
+; ix = this
+; hl <- clear command
+PointRenderer_GetClearCommand:
+	ld e,ixl
+	ld d,ixh
+	ld hl,PointRenderer.clearCommand
+	add hl,de
+	ret
 
 ; bc = count
 ; ix = vector array
@@ -91,30 +113,10 @@ Cull:
 ; e = y coordinate
 ; ix = this
 PointRenderer_DrawPoint:
-	push de
-	call VDPCommand_WaitReady
-	pop de
-	ld a,d
-	ld b,36
-	call VDP_SetRegister
-	xor a
-	ld b,37
-	call VDP_SetRegister
-	ld a,e
-	ld b,38
-	call VDP_SetRegister
-	ld a,(ix + PointRenderer.page)
-	ld b,39
-	call VDP_SetRegister
-	ld a,15
-	ld b,44
-	call VDP_SetRegister
-	xor a
-	ld b,45
-	call VDP_SetRegister
-	ld a,VDPCommand_PSET | VDPCommand_IMP
-	ld b,46
-	call VDP_SetRegister
+	ld (ix + PointRenderer.drawCommand + VDPCommand.dx),d
+	ld (ix + PointRenderer.drawCommand + VDPCommand.dy),e
+	call PointRenderer_GetDrawCommand
+	call VDPCommand_Execute_HL
 	ret
 
 ; ix = this
@@ -130,37 +132,9 @@ PointRenderer_Swap:
 	or 31
 	ld b,2
 	call VDP_SetRegister
-	xor a
-	ld b,36
-	call VDP_SetRegister
-	xor a
-	ld b,37
-	call VDP_SetRegister
-	xor a
-	ld b,38
-	call VDP_SetRegister
 	ld a,(ix + PointRenderer.page)
-	ld b,39
-	call VDP_SetRegister
-	xor a
-	ld b,40
-	call VDP_SetRegister
-	ld a,1
-	ld b,41
-	call VDP_SetRegister
-	ld a,212
-	ld b,42
-	call VDP_SetRegister
-	xor a
-	ld b,43
-	call VDP_SetRegister
-	xor a
-	ld b,44
-	call VDP_SetRegister
-	xor a
-	ld b,45
-	call VDP_SetRegister
-	ld a,VDPCommand_HMMV | VDPCommand_IMP
-	ld b,46
-	call VDP_SetRegister
+	ld (ix + PointRenderer.drawCommand + VDPCommand.dy + 1),a
+	ld (ix + PointRenderer.clearCommand + VDPCommand.dy + 1),a
+	call PointRenderer_GetClearCommand
+	call VDPCommand_Execute_HL
 	ret
