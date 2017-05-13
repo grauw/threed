@@ -2,6 +2,8 @@
 ; Top-level program class
 ;
 Application: MACRO
+	pointRenderer:
+		PointRenderer
 	ENDM
 
 Application_Main:
@@ -32,6 +34,13 @@ Application_Construct:
 	ret
 
 ; ix = this
+; ix <- point renderer
+Application_GetPointRenderer:
+	ld de,Application.pointRenderer
+	add ix,de
+	ret
+
+; ix = this
 Application_EnterMainLoop:
 	call VDP_EnableBlank
 	ld a,0
@@ -52,11 +61,15 @@ Application_EnterMainLoop:
 
 ; ix = this
 Application_MainLoop:
-	push ix
-	ld ix,Application_mvp
-	ld iy,Application_projection
-	call Matrix4x4_Multiply
-	pop ix
+	ld hl,Application_vertices
+	ld de,Application_verticesBuffer
+	ld bc,Application_vertices_COUNT * Vector4._size
+	ldir
+
+	ld hl,Application_projection
+	ld de,Application_mvp
+	ld bc,Matrix4x4._size
+	ldir
 
 	push ix
 	ld ix,Application_mvp
@@ -72,24 +85,33 @@ Application_MainLoop:
 
 	push ix
 	ld ix,Application_mvp
-	ld iy,Application_vertices
+	ld iy,Application_verticesBuffer
 	ld bc,Application_vertices_COUNT
 	call Matrix4x4_MultiplyVector4Array
 	pop ix
 
 	push ix
-	ld ix,Application_vertices
+	ld ix,Application_verticesBuffer
 	ld bc,Application_vertices_COUNT
 	call PointRenderer_PerspectiveDivideArray
 	pop ix
 
 	push ix
-	ld ix,Application_vertices
+	ld iy,Application_verticesBuffer
 	ld bc,Application_vertices_COUNT
+	call Application_GetPointRenderer
 	call PointRenderer_Draw
 	pop ix
 
-	jr $
+	push ix
+	call Application_GetPointRenderer
+	call PointRenderer_Swap
+	pop ix
+
+	ld a,(Application_model + Matrix4x4.row0 + Vector4.w)
+	add a,20H
+	ld (Application_model + Matrix4x4.row0 + Vector4.w),a
+
 	jp Application_MainLoop
 	ret
 
@@ -130,5 +152,8 @@ Application_projection:
 
 Application_mvp:
 	IdentityMatrix4x4
+
+Application_verticesBuffer:
+	ds Application_vertices_COUNT * Vector4._size
 
 	ENDS
