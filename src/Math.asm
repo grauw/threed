@@ -370,3 +370,37 @@ Math_ReciprocalSigned8_8:
 	ret z
 	dec bc
 	ret
+
+; hl = angle (binary radians)
+; de <- sine
+Math_Sine: PROC
+	bit 0,h
+	jr nz,Angle180
+	ld h,Math_sineTable >> 8
+	ld e,(hl)
+	inc h
+	ld d,(hl)
+	ret
+Angle180:
+	ld h,Math_sineTable >> 8
+	xor a
+	sub (hl)
+	ld e,a
+	inc h
+	sbc a,a
+	sub (hl)
+	ld d,a
+	ret
+	ENDP
+
+; hl = angle (binary radians)
+; de <- cosine
+Math_Cosine:
+	ld de,-80H
+	add hl,de
+	jp Math_Sine
+
+;
+	ALIGN 100H
+Math_sineTable:
+	INCLUDE "sinetable.asm"

@@ -200,3 +200,69 @@ Loop:
 	jr nz,Loop
 	ret
 	ENDP
+
+; hl = angle (binary radians)
+Matrix4x4_SetRotationX:
+	push hl
+	call Math_Cosine
+	ld (ix + Matrix4x4.row1 + Vector4.y),e
+	ld (ix + Matrix4x4.row1 + Vector4.y + 1),d
+	ld (ix + Matrix4x4.row2 + Vector4.z),e
+	ld (ix + Matrix4x4.row2 + Vector4.z + 1),d
+	pop hl
+	call Math_Sine
+	ld (ix + Matrix4x4.row2 + Vector4.y),e
+	ld (ix + Matrix4x4.row2 + Vector4.y + 1),d
+	xor a
+	sub e  ; negate de
+	ld e,a
+	sbc a,a
+	sub d
+	ld d,a
+	ld (ix + Matrix4x4.row1 + Vector4.z),e
+	ld (ix + Matrix4x4.row1 + Vector4.z + 1),d
+	ret
+
+; hl = angle (binary radians)
+Matrix4x4_SetRotationY:
+	push hl
+	call Math_Cosine
+	ld (ix + Matrix4x4.row0 + Vector4.x),e
+	ld (ix + Matrix4x4.row0 + Vector4.x + 1),d
+	ld (ix + Matrix4x4.row2 + Vector4.z),e
+	ld (ix + Matrix4x4.row2 + Vector4.z + 1),d
+	pop hl
+	call Math_Sine
+	ld (ix + Matrix4x4.row0 + Vector4.z),e
+	ld (ix + Matrix4x4.row0 + Vector4.z + 1),d
+	xor a
+	sub e  ; negate de
+	ld e,a
+	sbc a,a
+	sub d
+	ld d,a
+	ld (ix + Matrix4x4.row2 + Vector4.x),e
+	ld (ix + Matrix4x4.row2 + Vector4.x + 1),d
+	ret
+
+; hl = angle (binary radians)
+Matrix4x4_SetRotationZ:
+	push hl
+	call Math_Cosine
+	ld (ix + Matrix4x4.row0 + Vector4.x),e
+	ld (ix + Matrix4x4.row0 + Vector4.x + 1),d
+	ld (ix + Matrix4x4.row1 + Vector4.y),e
+	ld (ix + Matrix4x4.row1 + Vector4.y + 1),d
+	pop hl
+	call Math_Sine
+	ld (ix + Matrix4x4.row1 + Vector4.x),e
+	ld (ix + Matrix4x4.row1 + Vector4.x + 1),d
+	xor a
+	sub e  ; negate de
+	ld e,a
+	sbc a,a
+	sub d
+	ld d,a
+	ld (ix + Matrix4x4.row0 + Vector4.y),e
+	ld (ix + Matrix4x4.row0 + Vector4.y + 1),d
+	ret

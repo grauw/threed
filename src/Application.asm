@@ -2,6 +2,8 @@
 ; Top-level program class
 ;
 Application: MACRO
+	frame:
+		dw 0
 	pointRenderer:
 		PointRenderer
 	ENDM
@@ -61,6 +63,29 @@ Application_EnterMainLoop:
 
 ; ix = this
 Application_MainLoop:
+	push ix
+	ld l,(ix + Application.frame)
+	ld h,(ix + Application.frame + 1)
+	add hl,hl
+	add hl,hl
+	add hl,hl
+	ld ix,Application_rotation
+	call Matrix4x4_SetRotationY
+	pop ix
+
+	push ix
+	ld l,(ix + Application.frame)
+	ld h,(ix + Application.frame + 1)
+	add hl,hl
+	ld h,0
+	add hl,hl
+	dec h
+	add hl,hl
+	ld ix,Application_model
+	ld (ix + Matrix4x4.row0 + Vector4.w),l
+	ld (ix + Matrix4x4.row0 + Vector4.w + 1),h
+	pop ix
+
 	ld hl,Application_vertices
 	ld de,Application_verticesBuffer
 	ld bc,Application_vertices_COUNT * Vector4._size
@@ -80,6 +105,12 @@ Application_MainLoop:
 	push ix
 	ld ix,Application_mvp
 	ld iy,Application_model
+	call Matrix4x4_Multiply
+	pop ix
+
+	push ix
+	ld ix,Application_mvp
+	ld iy,Application_rotation
 	call Matrix4x4_Multiply
 	pop ix
 
@@ -108,9 +139,11 @@ Application_MainLoop:
 	call PointRenderer_Swap
 	pop ix
 
-	ld a,(Application_model + Matrix4x4.row0 + Vector4.w)
-	add a,20H
-	ld (Application_model + Matrix4x4.row0 + Vector4.w),a
+	ld l,(ix + Application.frame)
+	ld h,(ix + Application.frame + 1)
+	inc hl
+	ld (ix + Application.frame),l
+	ld (ix + Application.frame + 1),h
 
 	jp Application_MainLoop
 	ret
@@ -132,6 +165,9 @@ Application_vertices:
 
 Application_vertices_COUNT: equ 8
 
+Application_rotation:
+	IdentityMatrix4x4
+
 Application_model:
 	Matrix4x4  100H,    0H,    0H,    0H,
 	             0H,  100H,    0H,    0H,
@@ -141,13 +177,13 @@ Application_model:
 Application_view:
 	Matrix4x4  100H,    0H,    0H,    0H,
 	             0H,  100H,    0H,    0H,
-	             0H,    0H,  100H,  100H,
+	             0H,    0H,  100H,  200H,
 	             0H,    0H,    0H,  100H
 
 Application_projection:
-	Matrix4x4   40H,    0H,    0H,    0H,
-	             0H,   40H,    0H,    0H,
-	             0H,    0H,   40H,   20H,
+	Matrix4x4  100H,    0H,    0H,    0H,
+	             0H,  100H,    0H,    0H,
+	             0H,    0H,  100H,    0H,
 	             0H,    0H,  100H,  100H
 
 Application_mvp:

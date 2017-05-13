@@ -1,4 +1,6 @@
 all:
+	mkdir -p gen bin
+	node tools/gensinetable.js > gen/sinetable.asm
 	java -jar tools/glass.jar -I gen -I lib/neonlib/src src/ROM.asm bin/threed.rom bin/threed.sym
 
 run: all
