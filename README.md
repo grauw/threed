@@ -11,6 +11,9 @@ Project information
 Author: Laurens Holst <laurens.nospam@grauw.nl>  
 Site: <https://bitbucket.org/grauw/threed>  
 
+Coordinate system is left-handed, with positive x pointing right, positive y
+pointing up and positive z pointing forward.
+
 
 System Requirements
 -------------------
