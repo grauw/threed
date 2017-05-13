@@ -111,6 +111,70 @@ NoAdd:
 	ret
 	ENDP
 
+; hlbc = dividend
+; de = divisor
+; bc <- quotient
+; hl <- remainder
+; Modifies: af
+Math_Divide32x16: PROC
+	ld a,b
+	REPT 8
+	rla
+	adc hl,hl
+	sbc hl,de
+	jr nc,NoRestore
+	add hl,de
+NoRestore:
+	ENDM
+	rla
+	cpl
+	ld b,a
+	ld a,c
+	REPT 8
+	rla
+	adc hl,hl
+	sbc hl,de
+	jr nc,NoRestore
+	add hl,de
+NoRestore:
+	ENDM
+	rla
+	cpl
+	ld c,a
+	ret
+	ENDP
+
+; hlbc = dividend
+; de = divisor
+; bc <- quotient
+; hl <- remainder
+; Modifies: af
+Math_Divide32xNegated16: PROC
+	ld a,b
+	REPT 8
+	rla
+	adc hl,hl
+	add hl,de
+	jr c,NoRestore
+	sbc hl,de
+NoRestore:
+	ENDM
+	rla
+	ld b,a
+	ld a,c
+	REPT 8
+	rla
+	adc hl,hl
+	add hl,de
+	jr c,NoRestore
+	sbc hl,de
+NoRestore:
+	ENDM
+	rla
+	ld c,a
+	ret
+	ENDP
+
 ; bc = dividend
 ; de = divisor
 ; bc <- quotient
