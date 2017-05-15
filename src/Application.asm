@@ -6,6 +6,8 @@ Application: MACRO
 		dw 0
 	pointRenderer:
 		PointRenderer
+	edgeRenderer:
+		EdgeRenderer
 	ENDM
 
 Application_Main:
@@ -39,6 +41,13 @@ Application_Construct:
 ; ix <- point renderer
 Application_GetPointRenderer:
 	ld de,Application.pointRenderer
+	add ix,de
+	ret
+
+; ix = this
+; ix <- edge renderer
+Application_GetEdgeRenderer:
+	ld de,Application.edgeRenderer
 	add ix,de
 	ret
 
@@ -127,16 +136,29 @@ Application_MainLoop:
 	call PointRenderer_PerspectiveDivideArray
 	pop ix
 
+;	push ix
+;	ld iy,Application_verticesBuffer
+;	ld bc,Application_vertices_COUNT
+;	call Application_GetPointRenderer
+;	call PointRenderer_Draw
+;	pop ix
+;
+;	push ix
+;	call Application_GetPointRenderer
+;	call PointRenderer_Swap
+;	pop ix
+
 	push ix
+	ld hl,Application_edges
+	ld bc,Application_edges_COUNT
 	ld iy,Application_verticesBuffer
-	ld bc,Application_vertices_COUNT
-	call Application_GetPointRenderer
-	call PointRenderer_Draw
+	call Application_GetEdgeRenderer
+	call EdgeRenderer_Draw
 	pop ix
 
 	push ix
-	call Application_GetPointRenderer
-	call PointRenderer_Swap
+	call Application_GetEdgeRenderer
+	call EdgeRenderer_Swap
 	pop ix
 
 	ld l,(ix + Application.frame)
@@ -156,14 +178,30 @@ Application_instance: Application
 Application_vertices:
 	Vector4 80H, 80H, 80H, 100H
 	Vector4 -80H, 80H, 80H, 100H
-	Vector4 80H, -80H, 80H, 100H
 	Vector4 -80H, -80H, 80H, 100H
+	Vector4 80H, -80H, 80H, 100H
 	Vector4 80H, 80H, -80H, 100H
 	Vector4 -80H, 80H, -80H, 100H
-	Vector4 80H, -80H, -80H, 100H
 	Vector4 -80H, -80H, -80H, 100H
+	Vector4 80H, -80H, -80H, 100H
 
 Application_vertices_COUNT: equ 8
+
+Application_edges:
+	Edge 0, 1, 5
+	Edge 1, 2, 5
+	Edge 2, 3, 5
+	Edge 3, 0, 5
+	Edge 0, 4, 8
+	Edge 1, 5, 8
+	Edge 2, 6, 8
+	Edge 3, 7, 8
+	Edge 4, 5, 12
+	Edge 5, 6, 12
+	Edge 6, 7, 12
+	Edge 7, 4, 12
+
+Application_edges_COUNT: equ 12
 
 Application_rotation:
 	IdentityMatrix4x4

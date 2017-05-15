@@ -46,6 +46,8 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "Vector4.asm"
 	INCLUDE "Matrix4x4.asm"
 	INCLUDE "PointRenderer.asm"
+	INCLUDE "Edge.asm"
+	INCLUDE "EdgeRenderer.asm"
 
 	ENDS
 
