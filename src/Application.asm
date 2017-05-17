@@ -8,6 +8,8 @@ Application: MACRO
 		PointRenderer
 	edgeRenderer:
 		EdgeRenderer
+	faceRenderer:
+		FaceRenderer
 	ENDM
 
 Application_Main:
@@ -48,6 +50,13 @@ Application_GetPointRenderer:
 ; ix <- edge renderer
 Application_GetEdgeRenderer:
 	ld de,Application.edgeRenderer
+	add ix,de
+	ret
+
+; ix = this
+; ix <- face renderer
+Application_GetFaceRenderer:
+	ld de,Application.faceRenderer
 	add ix,de
 	ret
 
@@ -148,17 +157,30 @@ Application_MainLoop:
 ;	call PointRenderer_Swap
 ;	pop ix
 
-	push ix
-	ld hl,Application_edges
-	ld bc,Application_edges_COUNT
-	ld iy,Application_verticesBuffer
-	call Application_GetEdgeRenderer
-	call EdgeRenderer_Draw
-	pop ix
+;	push ix
+;	ld hl,Application_edges
+;	ld bc,Application_edges_COUNT
+;	ld iy,Application_verticesBuffer
+;	call Application_GetEdgeRenderer
+;	call EdgeRenderer_Draw
+;	pop ix
 
 	push ix
-	call Application_GetEdgeRenderer
-	call EdgeRenderer_Swap
+	ld hl,Application_faces
+	ld bc,Application_faces_COUNT
+	ld iy,Application_verticesBuffer
+	call Application_GetFaceRenderer
+	call FaceRenderer_Draw
+	pop ix
+
+;	push ix
+;	call Application_GetEdgeRenderer
+;	call EdgeRenderer_Swap
+;	pop ix
+
+	push ix
+	call Application_GetFaceRenderer
+	call FaceRenderer_Swap
 	pop ix
 
 	ld l,(ix + Application.frame)
@@ -202,6 +224,22 @@ Application_edges:
 	Edge 7, 4, 12
 
 Application_edges_COUNT: equ 12
+
+Application_faces:
+	Face 0, 4, 7, 8
+	Face 0, 7, 3, 8
+	Face 0, 1, 5, 8
+	Face 0, 5, 4, 8
+	Face 6, 5, 1, 8
+	Face 6, 1, 2, 8
+	Face 6, 2, 3, 8
+	Face 6, 3, 7, 8
+	Face 0, 1, 2, 5
+	Face 0, 2, 3, 5
+	Face 6, 5, 4, 12
+	Face 6, 4, 7, 12
+
+Application_faces_COUNT: equ 12
 
 Application_rotation:
 	IdentityMatrix4x4

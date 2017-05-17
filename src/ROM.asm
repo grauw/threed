@@ -48,6 +48,8 @@ ROM_BANK_A000_CHANGE: equ 0B000H
 	INCLUDE "PointRenderer.asm"
 	INCLUDE "Edge.asm"
 	INCLUDE "EdgeRenderer.asm"
+	INCLUDE "Face.asm"
+	INCLUDE "FaceRenderer.asm"
 
 	ENDS
 
