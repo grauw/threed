@@ -145,43 +145,9 @@ Application_MainLoop:
 	call PointRenderer_PerspectiveDivideArray
 	pop ix
 
-;	push ix
-;	ld iy,Application_verticesBuffer
-;	ld bc,Application_vertices_COUNT
-;	call Application_GetPointRenderer
-;	call PointRenderer_Draw
-;	pop ix
-;
-;	push ix
-;	call Application_GetPointRenderer
-;	call PointRenderer_Swap
-;	pop ix
-
-;	push ix
-;	ld hl,Application_edges
-;	ld bc,Application_edges_COUNT
-;	ld iy,Application_verticesBuffer
-;	call Application_GetEdgeRenderer
-;	call EdgeRenderer_Draw
-;	pop ix
-
-	push ix
-	ld hl,Application_faces
-	ld bc,Application_faces_COUNT
-	ld iy,Application_verticesBuffer
-	call Application_GetFaceRenderer
-	call FaceRenderer_Draw
-	pop ix
-
-;	push ix
-;	call Application_GetEdgeRenderer
-;	call EdgeRenderer_Swap
-;	pop ix
-
-	push ix
-	call Application_GetFaceRenderer
-	call FaceRenderer_Swap
-	pop ix
+;	call Application_DrawPoints
+;	call Application_DrawEdges
+	call Application_DrawFaces
 
 	ld l,(ix + Application.frame)
 	ld h,(ix + Application.frame + 1)
@@ -190,6 +156,41 @@ Application_MainLoop:
 	ld (ix + Application.frame + 1),h
 
 	jp Application_MainLoop
+	ret
+
+; ix = this
+Application_DrawPoints:
+	push ix
+	ld iy,Application_verticesBuffer
+	ld bc,Application_vertices_COUNT
+	call Application_GetPointRenderer
+	call PointRenderer_Draw
+	call PointRenderer_Swap
+	pop ix
+	ret
+
+; ix = this
+Application_DrawEdges:
+	push ix
+	ld hl,Application_edges
+	ld bc,Application_edges_COUNT
+	ld iy,Application_verticesBuffer
+	call Application_GetEdgeRenderer
+	call EdgeRenderer_Draw
+	call EdgeRenderer_Swap
+	pop ix
+	ret
+
+; ix = this
+Application_DrawFaces:
+	push ix
+	ld hl,Application_faces
+	ld bc,Application_faces_COUNT
+	ld iy,Application_verticesBuffer
+	call Application_GetFaceRenderer
+	call FaceRenderer_Draw
+	call FaceRenderer_Swap
+	pop ix
 	ret
 
 ;
