@@ -82,21 +82,22 @@ EdgeRenderer_GetVertexXY:
 ; ix = this
 EdgeRenderer_DrawEdge: PROC
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.color),a
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dx),b
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dy),c
 	ld a,c
 	sub e
-	jr c,CLessThanE
-CGreaterThanE:
-	set 3,(ix + EdgeRenderer.drawCommand + VDPCommand.argument)
-	jr YContinue
-CLessThanE:
+	jr nc,YContinue
 	neg
-	res 3,(ix + EdgeRenderer.drawCommand + VDPCommand.argument)
+	ld l,e  ; ex bc,de
+	ld e,c
+	ld c,l
+	ld l,d
+	ld d,b
+	ld b,l
 YContinue:
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.ny),a
-	ld a,b
-	sub d
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dx),d
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dy),e
+	ld a,d
+	sub b
 	jr c,BLessThanD
 BGreaterThanD:
 	set 2,(ix + EdgeRenderer.drawCommand + VDPCommand.argument)
