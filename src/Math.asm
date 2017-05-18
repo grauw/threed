@@ -15,6 +15,7 @@ NegativeMultiplicand:
 	Math_MULTIPLY16X16
 	ex de,hl
 	pop bc
+	and a
 	sbc hl,bc
 	ex de,hl
 	ret
@@ -23,6 +24,7 @@ NegativeMultiplier:
 	Math_MULTIPLY16X16
 	ex de,hl
 	pop bc
+	and a
 	sbc hl,bc
 	ex de,hl
 	ret
@@ -32,8 +34,10 @@ NegativeBoth:
 	Math_MULTIPLY16X16
 	ex de,hl
 	pop bc
+	and a
 	sbc hl,bc
 	pop bc
+	and a
 	sbc hl,bc
 	ex de,hl
 	ret
