@@ -17,9 +17,6 @@ Application_Main:
 	cp 2
 	ret c
 
-	call ROM_Init
-	call RAM_Init
-
 	IF R800
 	call System_EnableTurbo
 	ELSE
