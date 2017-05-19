@@ -25,25 +25,25 @@ Edge_Prepare: PROC
 	ld b,(ix + Edge.one + 1)
 	ld iyl,c
 	ld iyh,b
-	ld h,(iy + Vector4.x)
-	ld l,(iy + Vector4.y)
+	ld l,(iy + Vector4.x)
+	ld h,(iy + Vector4.y)
 	ld c,(ix + Edge.two)
 	ld b,(ix + Edge.two + 1)
 	ld iyl,c
 	ld iyh,b
-	ld d,(iy + Vector4.x)
-	ld e,(iy + Vector4.y)
-	ld a,e
-	sub l
+	ld e,(iy + Vector4.x)
+	ld d,(iy + Vector4.y)
+	ld a,d
+	sub h
 	jr nc,NoSwap
 	ex de,hl
 	neg
 NoSwap:
-	ld (ix + Edge.x),h
-	ld (ix + Edge.y),l
+	ld (ix + Edge.x),l
+	ld (ix + Edge.y),h
 	ld (ix + Edge.dy),a
-	ld a,d
-	sub h
+	ld a,e
+	sub l
 	ld (ix + Edge.dx),a
 	ret
 	ENDP

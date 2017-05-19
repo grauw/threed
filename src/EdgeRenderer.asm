@@ -69,32 +69,32 @@ EdgeRenderer_Prepare:
 ; iy = edge
 ; ix = this
 EdgeRenderer_DrawEdge: PROC
-	ld d,(iy + Edge.x)
-	ld e,(iy + Edge.y)
-	ld b,(iy + Edge.dx)
-	ld c,(iy + Edge.dy)
+	ld e,(iy + Edge.x)
+	ld d,(iy + Edge.y)
+	ld c,(iy + Edge.dx)
+	ld b,(iy + Edge.dy)
 	ld a,(iy + Edge.color)
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.color),a
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dx),d
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dy),e
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dx),e
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dy),d
 	ld l,0
-	ld a,d
-	add a,b
+	ld a,e
+	add a,c
 	jr nc,NoFlipX
 	xor a
-	sub b
-	ld b,a
+	sub c
+	ld c,a
 	set 2,l
 NoFlipX:
-	ld a,b
-	cp c
+	ld a,c
+	cp b
 	jr nc,NoSwapN
-	ld b,c
-	ld c,a
+	ld c,b
+	ld b,a
 	set 0,l
 NoSwapN:
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.nx),b
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.ny),c
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.nx),c
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.ny),b
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.argument),l
 	call EdgeRenderer_GetDrawCommand
 	call VDPCommand_Execute_HL

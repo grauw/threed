@@ -45,20 +45,20 @@ Loop:
 	ld d,(iy + Face.one + 1)
 	ld ixl,e
 	ld ixh,d
-	ld b,(ix + Vector4.x)
-	ld c,(ix + Vector4.y)
+	ld c,(ix + Vector4.x)
+	ld b,(ix + Vector4.y)
 	ld e,(iy + Face.two)
 	ld d,(iy + Face.two + 1)
 	ld ixl,e
 	ld ixh,d
-	ld h,(ix + Vector4.x)
-	ld l,(ix + Vector4.y)
+	ld l,(ix + Vector4.x)
+	ld h,(ix + Vector4.y)
 	ld e,(iy + Face.three)
 	ld d,(iy + Face.three + 1)
 	ld ixl,e
 	ld ixh,d
-	ld d,(ix + Vector4.x)
-	ld e,(ix + Vector4.y)
+	ld e,(ix + Vector4.x)
+	ld d,(ix + Vector4.y)
 	pop ix
 	ld a,(iy + Face.color)
 	call FaceRenderer_DrawFace
@@ -72,10 +72,10 @@ Loop:
 	ENDP
 
 ; a = color
-; b = x coordinate 1
-; c = y coordinate 1
-; d = x coordinate 2
-; e = y coordinate 2
+; c = x coordinate 1
+; b = y coordinate 1
+; e = x coordinate 2
+; d = y coordinate 2
 ; l = x coordinate 3
 ; h = y coordinate 3
 ; ix = this
@@ -102,15 +102,15 @@ FaceRenderer_DrawFace:
 	ret
 
 ; a = color
-; b = x coordinate 1
-; c = y coordinate 1
-; d = x coordinate 2
-; e = y coordinate 2
+; c = x coordinate 1
+; b = y coordinate 1
+; e = x coordinate 2
+; d = y coordinate 2
 ; ix = this
 FaceRenderer_DrawEdge: PROC
 	ld (ix + FaceRenderer.drawCommand + VDPCommand.color),a
-	ld a,c
-	sub e
+	ld a,b
+	sub d
 	jr nc,YContinue
 	neg
 	ld l,e  ; ex bc,de
@@ -121,10 +121,10 @@ FaceRenderer_DrawEdge: PROC
 	ld b,l
 YContinue:
 	ld (ix + FaceRenderer.drawCommand + VDPCommand.ny),a
-	ld (ix + FaceRenderer.drawCommand + VDPCommand.dx),d
-	ld (ix + FaceRenderer.drawCommand + VDPCommand.dy),e
-	ld a,d
-	sub b
+	ld (ix + FaceRenderer.drawCommand + VDPCommand.dx),e
+	ld (ix + FaceRenderer.drawCommand + VDPCommand.dy),d
+	ld a,e
+	sub c
 	jr c,BLessThanD
 BGreaterThanD:
 	set 2,(ix + FaceRenderer.drawCommand + VDPCommand.argument)
@@ -138,10 +138,10 @@ XContinue:
 	cp (ix + FaceRenderer.drawCommand + VDPCommand.ny)
 	jr nc,NXLessThanNY
 NXGreaterThanNY:
-	ld b,(ix + FaceRenderer.drawCommand + VDPCommand.ny)
-	ld c,(ix + FaceRenderer.drawCommand + VDPCommand.nx)
-	ld (ix + FaceRenderer.drawCommand + VDPCommand.ny),c
-	ld (ix + FaceRenderer.drawCommand + VDPCommand.nx),b
+	ld b,(ix + FaceRenderer.drawCommand + VDPCommand.nx)
+	ld c,(ix + FaceRenderer.drawCommand + VDPCommand.ny)
+	ld (ix + FaceRenderer.drawCommand + VDPCommand.nx),c
+	ld (ix + FaceRenderer.drawCommand + VDPCommand.ny),b
 	set 0,(ix + FaceRenderer.drawCommand + VDPCommand.argument)
 	jr NContinue
 NXLessThanNY:

@@ -69,11 +69,11 @@ PointRenderer_Prepare:
 ; iy = point
 ; ix = this
 PointRenderer_DrawPoint:
-	ld d,(iy + Point.x)
-	ld e,(iy + Point.y)
+	ld e,(iy + Point.x)
+	ld d,(iy + Point.y)
 	ld a,(iy + Point.color)
-	ld (ix + PointRenderer.drawCommand + VDPCommand.dx),d
-	ld (ix + PointRenderer.drawCommand + VDPCommand.dy),e
+	ld (ix + PointRenderer.drawCommand + VDPCommand.dx),e
+	ld (ix + PointRenderer.drawCommand + VDPCommand.dy),d
 	ld (ix + PointRenderer.drawCommand + VDPCommand.color),a
 	call PointRenderer_GetDrawCommand
 	call VDPCommand_Execute_HL

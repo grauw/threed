@@ -19,10 +19,10 @@ Point_Prepare: PROC
 	ld b,(ix + Point.vertex + 1)
 	ld iyl,c
 	ld iyh,b
-	ld h,(iy + Vector4.x)
-	ld l,(iy + Vector4.y)
-	ld (ix + Point.x),h
-	ld (ix + Point.y),l
+	ld l,(iy + Vector4.x)
+	ld h,(iy + Vector4.y)
+	ld (ix + Point.x),l
+	ld (ix + Point.y),h
 	ret
 	ENDP
 
