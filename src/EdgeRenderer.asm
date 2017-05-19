@@ -5,7 +5,7 @@ EdgeRenderer: MACRO
 	page:
 		db 0
 	drawCommand:
-		VDPCommand 0, 0, 0, 0, 0, 0, 0, 1, VDPCommand_LINE | VDPCommand_IMP
+		VDPCommand 0, 0, 0, 0, 0, 0, 0, 0, VDPCommand_LINE | VDPCommand_IMP
 	clearCommand:
 		VDPCommand 0, 0, 0, 0, 256, 212, 0, 0, VDPCommand_HMMV | VDPCommand_IMP
 	ENDM
@@ -45,12 +45,6 @@ Loop:
 	ld e,(iy + Edge.y)
 	ld b,(iy + Edge.dx)
 	ld c,(iy + Edge.dy)
-	ld a,b
-	add a,d
-	ld b,a
-	ld a,c
-	add a,e
-	ld c,a
 	ld a,(iy + Edge.color)
 	call EdgeRenderer_DrawEdge
 	ld bc,Edge._size
@@ -78,51 +72,34 @@ EdgeRenderer_Prepare:
 	ret
 
 ; a = color
-; b = x coordinate 1
-; c = y coordinate 1
-; d = x coordinate 2
-; e = y coordinate 2
+; b = dx
+; c = dy
+; d = x
+; e = y
 ; ix = this
 EdgeRenderer_DrawEdge: PROC
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.color),a
-	ld a,c
-	sub e
-	jr nc,YContinue
-	neg
-	ld l,e  ; ex bc,de
-	ld e,c
-	ld c,l
-	ld l,d
-	ld d,b
-	ld b,l
-YContinue:
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.ny),a
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dx),d
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dy),e
+	ld l,0
 	ld a,d
+	add a,b
+	jr nc,NoFlipX
+	xor a
 	sub b
-	jr c,BLessThanD
-BGreaterThanD:
-	set 2,(ix + EdgeRenderer.drawCommand + VDPCommand.argument)
-	jr XContinue
-BLessThanD:
-	neg
-	res 2,(ix + EdgeRenderer.drawCommand + VDPCommand.argument)
-XContinue:
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.nx),a
-	ld a,(ix + EdgeRenderer.drawCommand + VDPCommand.nx)
-	cp (ix + EdgeRenderer.drawCommand + VDPCommand.ny)
-	jr nc,NXLessThanNY
-NXGreaterThanNY:
-	ld b,(ix + EdgeRenderer.drawCommand + VDPCommand.ny)
-	ld c,(ix + EdgeRenderer.drawCommand + VDPCommand.nx)
-	ld (ix + EdgeRenderer.drawCommand + VDPCommand.ny),c
+	ld b,a
+	set 2,l
+NoFlipX:
+	ld a,b
+	cp c
+	jr nc,NoSwapN
+	ld b,c
+	ld c,a
+	set 0,l
+NoSwapN:
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.nx),b
-	set 0,(ix + EdgeRenderer.drawCommand + VDPCommand.argument)
-	jr NContinue
-NXLessThanNY:
-	res 0,(ix + EdgeRenderer.drawCommand + VDPCommand.argument)
-NContinue:
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.ny),c
+	ld (ix + EdgeRenderer.drawCommand + VDPCommand.argument),l
 	call EdgeRenderer_GetDrawCommand
 	call VDPCommand_Execute_HL
 	ret
