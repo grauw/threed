@@ -29,8 +29,7 @@ FaceRenderer_GetClearCommand:
 	ret
 
 ; bc = count
-; hl = faces
-; iy = vertices
+; iy = faces
 ; ix = this
 FaceRenderer_Draw: PROC
 	dec bc  ; 16-bit to 2x 8-bit loop
@@ -41,43 +40,36 @@ FaceRenderer_Draw: PROC
 	ld c,a
 Loop:
 	push bc
-	push hl
-	call FaceRenderer_GetVertexXY
-	ld c,e
-	ld b,d
-	call FaceRenderer_GetVertexXY
-	push de
-	call FaceRenderer_GetVertexXY
-	ld a,(hl)
-	ex de,hl
-	pop de
+	push ix
+	ld e,(iy + Face.one)
+	ld d,(iy + Face.one + 1)
+	ld ixl,e
+	ld ixh,d
+	ld b,(ix + Vector4.x)
+	ld c,(ix + Vector4.y)
+	ld e,(iy + Face.two)
+	ld d,(iy + Face.two + 1)
+	ld ixl,e
+	ld ixh,d
+	ld h,(ix + Vector4.x)
+	ld l,(ix + Vector4.y)
+	ld e,(iy + Face.three)
+	ld d,(iy + Face.three + 1)
+	ld ixl,e
+	ld ixh,d
+	ld d,(ix + Vector4.x)
+	ld e,(ix + Vector4.y)
+	pop ix
+	ld a,(iy + Face.color)
 	call FaceRenderer_DrawFace
-	pop hl
 	ld bc,Face._size
-	add hl,bc
+	add iy,bc
 	pop bc
 	djnz Loop
 	dec c
 	jr nz,Loop
 	ret
 	ENDP
-
-; hl = vertex offset
-; iy = vertices
-; d <- x
-; e <- y
-; hl <- updated
-FaceRenderer_GetVertexXY:
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	inc hl
-	push iy
-	add iy,de
-	ld d,(iy + Vector4.x)
-	ld e,(iy + Vector4.y)
-	pop iy
-	ret
 
 ; a = color
 ; b = x coordinate 1

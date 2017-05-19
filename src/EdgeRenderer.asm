@@ -29,8 +29,7 @@ EdgeRenderer_GetClearCommand:
 	ret
 
 ; bc = count
-; hl = edges
-; iy = vertices
+; iy = edges
 ; ix = this
 EdgeRenderer_Draw: PROC
 	dec bc  ; 16-bit to 2x 8-bit loop
@@ -41,38 +40,30 @@ EdgeRenderer_Draw: PROC
 	ld c,a
 Loop:
 	push bc
-	call EdgeRenderer_GetVertexXY
-	ld c,e
-	ld b,d
-	call EdgeRenderer_GetVertexXY
-	ld a,(hl)
-	inc hl
-	push hl
+	push ix
+	ld e,(iy + Edge.one)
+	ld d,(iy + Edge.one + 1)
+	ld ixl,e
+	ld ixh,d
+	ld b,(ix + Vector4.x)
+	ld c,(ix + Vector4.y)
+	ld e,(iy + Edge.two)
+	ld d,(iy + Edge.two + 1)
+	ld ixl,e
+	ld ixh,d
+	ld d,(ix + Vector4.x)
+	ld e,(ix + Vector4.y)
+	pop ix
+	ld a,(iy + Edge.color)
 	call EdgeRenderer_DrawEdge
-	pop hl
+	ld bc,Edge._size
+	add iy,bc
 	pop bc
 	djnz Loop
 	dec c
 	jr nz,Loop
 	ret
 	ENDP
-
-; hl = vertex offset
-; iy = vertices
-; d <- x
-; e <- y
-; hl <- updated
-EdgeRenderer_GetVertexXY:
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	inc hl
-	push iy
-	add iy,de
-	ld d,(iy + Vector4.x)
-	ld e,(iy + Vector4.y)
-	pop iy
-	ret
 
 ; a = color
 ; b = x coordinate 1

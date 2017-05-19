@@ -73,6 +73,20 @@ Application_EnterMainLoop:
 
 	call VDP_DisableBlank
 
+	push ix
+	ld ix,Application_edges
+	ld bc,Application_edges_COUNT
+	ld de,Application_verticesBuffer
+	call Edge_BakeArrayVertices
+	pop ix
+
+	push ix
+	ld ix,Application_faces
+	ld bc,Application_faces_COUNT
+	ld de,Application_verticesBuffer
+	call Face_BakeArrayVertices
+	pop ix
+
 	call Application_MainLoop
 	ret
 
@@ -169,9 +183,8 @@ Application_DrawPoints:
 ; ix = this
 Application_DrawEdges:
 	push ix
-	ld hl,Application_edges
+	ld iy,Application_edges
 	ld bc,Application_edges_COUNT
-	ld iy,Application_verticesBuffer
 	call Application_GetEdgeRenderer
 	call EdgeRenderer_Draw
 	call EdgeRenderer_Swap
@@ -181,9 +194,8 @@ Application_DrawEdges:
 ; ix = this
 Application_DrawFaces:
 	push ix
-	ld hl,Application_faces
+	ld iy,Application_faces
 	ld bc,Application_faces_COUNT
-	ld iy,Application_verticesBuffer
 	call Application_GetFaceRenderer
 	call FaceRenderer_Draw
 	call FaceRenderer_Swap
