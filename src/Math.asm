@@ -305,6 +305,12 @@ NegativeBoth:
 ; hl <- remainder
 ; Modifies: af
 Math_Reciprocal8_8: PROC
+	xor a
+	cp d
+	jr z,SlowPath
+	ld hl,100H
+	jr FastPath
+SlowPath:
 	ld hl,1
 	REPT 8
 	add hl,hl
@@ -315,6 +321,7 @@ NoRestore:
 	rla
 	ENDM
 	cpl
+FastPath:
 	ld b,a
 	REPT 8
 	add hl,hl
@@ -334,6 +341,12 @@ NoRestore:
 ; hl <- remainder
 ; Modifies: af
 Math_ReciprocalNegated8_8: PROC
+	xor a
+	cp d
+	jr z,SlowPath
+	ld hl,100H
+	jr FastPath
+SlowPath:
 	ld hl,1
 	REPT 8
 	add hl,hl
@@ -343,6 +356,7 @@ Math_ReciprocalNegated8_8: PROC
 NoRestore:
 	rla
 	ENDM
+FastPath:
 	ld b,a
 	REPT 8
 	add hl,hl
