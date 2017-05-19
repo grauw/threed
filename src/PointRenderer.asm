@@ -1,5 +1,5 @@
 ;
-; Renders a vector array as points
+; Renders a points array
 ;
 PointRenderer: MACRO
 	page:
@@ -28,10 +28,11 @@ PointRenderer_GetClearCommand:
 	add hl,de
 	ret
 
-; iy = vertices
+; iy = points
 ; bc = count
 ; ix = this
 PointRenderer_Draw: PROC
+	call PointRenderer_Prepare
 	dec bc  ; 16-bit to 2x 8-bit loop
 	inc b
 	inc c
@@ -39,17 +40,10 @@ PointRenderer_Draw: PROC
 	ld b,c
 	ld c,a
 Loop:
-	ld a,(iy + Vector4.x + 1)
-	or (iy + Vector4.y + 1)
-	or (iy + Vector4.z + 1)
-	jr nz,Cull
-	ld d,(iy + Vector4.x)
-	ld e,(iy + Vector4.y)
 	push bc
 	call PointRenderer_DrawPoint
 	pop bc
-Cull:
-	ld de,Vector4._size
+	ld de,Point._size
 	add iy,de
 	djnz Loop
 	dec c
@@ -57,12 +51,30 @@ Cull:
 	ret
 	ENDP
 
-; d = x coordinate
-; e = y coordinate
+; bc = count
+; iy = points
+; ix = this
+PointRenderer_Prepare:
+	push bc
+	push ix
+	push iy
+	push iy
+	pop ix
+	call Point_PrepareArray
+	pop iy
+	pop ix
+	pop bc
+	ret
+
+; iy = point
 ; ix = this
 PointRenderer_DrawPoint:
+	ld d,(iy + Point.x)
+	ld e,(iy + Point.y)
+	ld a,(iy + Point.color)
 	ld (ix + PointRenderer.drawCommand + VDPCommand.dx),d
 	ld (ix + PointRenderer.drawCommand + VDPCommand.dy),e
+	ld (ix + PointRenderer.drawCommand + VDPCommand.color),a
 	call PointRenderer_GetDrawCommand
 	call VDPCommand_Execute_HL
 	ret

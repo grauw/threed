@@ -74,6 +74,13 @@ Application_EnterMainLoop:
 	call VDP_DisableBlank
 
 	push ix
+	ld ix,Application_points
+	ld bc,Application_points_COUNT
+	ld de,Application_verticesBuffer
+	call Point_BakeArrayVertices
+	pop ix
+
+	push ix
 	ld ix,Application_edges
 	ld bc,Application_edges_COUNT
 	ld de,Application_verticesBuffer
@@ -156,9 +163,9 @@ Application_MainLoop:
 	call Vector4_PerspectiveDivideArray
 	pop ix
 
-;	call Application_DrawPoints
+	call Application_DrawPoints
 ;	call Application_DrawEdges
-	call Application_DrawFaces
+;	call Application_DrawFaces
 
 	ld l,(ix + Application.frame)
 	ld h,(ix + Application.frame + 1)
@@ -172,8 +179,8 @@ Application_MainLoop:
 ; ix = this
 Application_DrawPoints:
 	push ix
-	ld iy,Application_verticesBuffer
-	ld bc,Application_vertices_COUNT
+	ld iy,Application_points
+	ld bc,Application_points_COUNT
 	call Application_GetPointRenderer
 	call PointRenderer_Draw
 	call PointRenderer_Swap
@@ -218,6 +225,18 @@ Application_vertices:
 	Vector4 80H, -80H, -80H, 100H
 
 Application_vertices_COUNT: equ 8
+
+Application_points:
+	Point 0, 9
+	Point 1, 9
+	Point 2, 9
+	Point 3, 9
+	Point 4, 11
+	Point 5, 11
+	Point 6, 11
+	Point 7, 11
+
+Application_points_COUNT: equ 8
 
 Application_edges:
 	Edge 0, 1, 5
