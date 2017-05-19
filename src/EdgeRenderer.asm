@@ -41,11 +41,6 @@ EdgeRenderer_Draw: PROC
 	ld c,a
 Loop:
 	push bc
-	ld d,(iy + Edge.x)
-	ld e,(iy + Edge.y)
-	ld b,(iy + Edge.dx)
-	ld c,(iy + Edge.dy)
-	ld a,(iy + Edge.color)
 	call EdgeRenderer_DrawEdge
 	ld bc,Edge._size
 	add iy,bc
@@ -71,13 +66,14 @@ EdgeRenderer_Prepare:
 	pop bc
 	ret
 
-; a = color
-; b = dx
-; c = dy
-; d = x
-; e = y
+; iy = edge
 ; ix = this
 EdgeRenderer_DrawEdge: PROC
+	ld d,(iy + Edge.x)
+	ld e,(iy + Edge.y)
+	ld b,(iy + Edge.dx)
+	ld c,(iy + Edge.dy)
+	ld a,(iy + Edge.color)
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.color),a
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dx),d
 	ld (ix + EdgeRenderer.drawCommand + VDPCommand.dy),e
