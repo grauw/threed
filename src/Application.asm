@@ -153,7 +153,7 @@ Application_MainLoop:
 	push ix
 	ld ix,Application_verticesBuffer
 	ld bc,Application_vertices_COUNT
-	call PointRenderer_PerspectiveDivideArray
+	call Vector4_PerspectiveDivideArray
 	pop ix
 
 ;	call Application_DrawPoints
