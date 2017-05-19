@@ -32,6 +32,7 @@ EdgeRenderer_GetClearCommand:
 ; iy = edges
 ; ix = this
 EdgeRenderer_Draw: PROC
+	call EdgeRenderer_Prepare
 	dec bc  ; 16-bit to 2x 8-bit loop
 	inc b
 	inc c
@@ -40,20 +41,16 @@ EdgeRenderer_Draw: PROC
 	ld c,a
 Loop:
 	push bc
-	push ix
-	ld e,(iy + Edge.one)
-	ld d,(iy + Edge.one + 1)
-	ld ixl,e
-	ld ixh,d
-	ld b,(ix + Vector4.x)
-	ld c,(ix + Vector4.y)
-	ld e,(iy + Edge.two)
-	ld d,(iy + Edge.two + 1)
-	ld ixl,e
-	ld ixh,d
-	ld d,(ix + Vector4.x)
-	ld e,(ix + Vector4.y)
-	pop ix
+	ld d,(iy + Edge.x)
+	ld e,(iy + Edge.y)
+	ld b,(iy + Edge.dx)
+	ld c,(iy + Edge.dy)
+	ld a,b
+	add a,d
+	ld b,a
+	ld a,c
+	add a,e
+	ld c,a
 	ld a,(iy + Edge.color)
 	call EdgeRenderer_DrawEdge
 	ld bc,Edge._size
@@ -64,6 +61,21 @@ Loop:
 	jr nz,Loop
 	ret
 	ENDP
+
+; bc = count
+; iy = edges
+; ix = this
+EdgeRenderer_Prepare:
+	push bc
+	push ix
+	push iy
+	push iy
+	pop ix
+	call Edge_PrepareArray
+	pop iy
+	pop ix
+	pop bc
+	ret
 
 ; a = color
 ; b = x coordinate 1
