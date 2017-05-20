@@ -2,30 +2,24 @@
 ; Renders a points array
 ;
 PointRenderer: MACRO
-	page:
-		db 0
-	drawCommand:
-		VDPCommand 0, 0, 0, 0, 0, 0, 15, 0, VDPCommand_PSET | VDPCommand_IMP
-	clearCommand:
-		VDPCommand 0, 0, 0, 0, 256, 212, 0, 0, VDPCommand_HMMV | VDPCommand_IMP
+	image:
+		dw 0
 	ENDM
 
+; de = image
 ; ix = this
-; hl <- point command
-PointRenderer_GetDrawCommand:
-	ld e,ixl
-	ld d,ixh
-	ld hl,PointRenderer.drawCommand
-	add hl,de
+PointRenderer_Construct:
+	ld (ix + PointRenderer.image),e
+	ld (ix + PointRenderer.image + 1),d
 	ret
 
 ; ix = this
-; hl <- clear command
-PointRenderer_GetClearCommand:
-	ld e,ixl
-	ld d,ixh
-	ld hl,PointRenderer.clearCommand
-	add hl,de
+; ix <- image
+PointRenderer_GetImage:
+	ld e,(ix + PointRenderer.image)
+	ld d,(ix + PointRenderer.image + 1)
+	ld ixl,e
+	ld ixh,d
 	ret
 
 ; iy = points
@@ -69,32 +63,11 @@ PointRenderer_Prepare:
 ; iy = point
 ; ix = this
 PointRenderer_DrawPoint:
+	push ix
+	call PointRenderer_GetImage
 	ld e,(iy + Point.x)
 	ld d,(iy + Point.y)
 	ld a,(iy + Point.color)
-	ld (ix + PointRenderer.drawCommand + VDPCommand.dx),e
-	ld (ix + PointRenderer.drawCommand + VDPCommand.dy),d
-	ld (ix + PointRenderer.drawCommand + VDPCommand.color),a
-	call PointRenderer_GetDrawCommand
-	call VDPCommand_Execute_HL
-	ret
-
-; ix = this
-PointRenderer_Swap:
-	call VDPCommand_WaitReady
-	ld a,(ix + PointRenderer.page)
-	xor 1
-	ld (ix + PointRenderer.page),a
-	xor 1
-	rrca
-	rrca
-	rrca
-	or 31
-	ld b,2
-	call VDP_SetRegister
-	ld a,(ix + PointRenderer.page)
-	ld (ix + PointRenderer.drawCommand + VDPCommand.dy + 1),a
-	ld (ix + PointRenderer.clearCommand + VDPCommand.dy + 1),a
-	call PointRenderer_GetClearCommand
-	call VDPCommand_Execute_HL
+	call RunLengthImage_Pset
+	pop ix
 	ret

@@ -10,6 +10,8 @@ Application: MACRO
 		EdgeRenderer
 	faceRenderer:
 		FaceRenderer
+	image:
+		RunLengthImage
 	ENDM
 
 Application_Main:
@@ -34,6 +36,14 @@ Application_Main:
 
 ; ix = this
 Application_Construct:
+	push ix
+	push ix
+	call Application_GetImage
+	ex (sp),ix
+	call Application_GetPointRenderer
+	pop de
+	call PointRenderer_Construct
+	pop ix
 	ret
 
 ; ix = this
@@ -54,6 +64,13 @@ Application_GetEdgeRenderer:
 ; ix <- face renderer
 Application_GetFaceRenderer:
 	ld de,Application.faceRenderer
+	add ix,de
+	ret
+
+; ix = this
+; ix <- image
+Application_GetImage:
+	ld de,Application.image
 	add ix,de
 	ret
 
@@ -179,11 +196,20 @@ Application_MainLoop:
 ; ix = this
 Application_DrawPoints:
 	push ix
+	call Application_GetImage
+	call RunLengthImage_ClearBlack
+	pop ix
+
+	push ix
 	ld iy,Application_points
 	ld bc,Application_points_COUNT
 	call Application_GetPointRenderer
 	call PointRenderer_Draw
-	call PointRenderer_Swap
+	pop ix
+
+	push ix
+	call Application_GetImage
+	call RunLengthImage_Draw
 	pop ix
 	ret
 
@@ -227,14 +253,14 @@ Application_vertices:
 Application_vertices_COUNT: equ 8
 
 Application_points:
-	Point 0, 9
-	Point 1, 9
-	Point 2, 9
-	Point 3, 9
-	Point 4, 11
-	Point 5, 11
-	Point 6, 11
-	Point 7, 11
+	Point 0, 99H
+	Point 1, 99H
+	Point 2, 99H
+	Point 3, 99H
+	Point 4, 0BBH
+	Point 5, 0BBH
+	Point 6, 0BBH
+	Point 7, 0BBH
 
 Application_points_COUNT: equ 8
 
