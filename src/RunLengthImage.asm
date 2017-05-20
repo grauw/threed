@@ -188,8 +188,38 @@ Found:
 	ret
 	ENDP
 
+RunLengthImage_Draw: equ SCREENMODE = 5 || SCREENMODE = 6 ? RunLengthImage_Draw4Bpp : RunLengthImage_Draw8Bpp
+
 ; ix = this
-RunLengthImage_Draw: PROC
+RunLengthImage_Draw8Bpp: PROC
+	ld hl,0
+	ld a,(ix + RunLengthImage.page)
+	call VDP_SetWriteAddress
+	call RunLengthImage_GetSpans
+	ld c,(ix + RunLengthImage.spanCount)
+	ld b,(ix + RunLengthImage.spanCount + 1)
+	dec bc  ; 16-bit to 2x 8-bit loop
+	inc b
+	inc c
+	ld e,c
+	ld d,b
+Loop:
+	ld b,(hl)
+	inc hl
+	ld a,(hl)
+	inc hl
+OutLoop:
+	out (VDP_PORT_0),a
+	djnz OutLoop
+	dec e
+	jr nz,Loop
+	dec d
+	jr nz,Loop
+	ret
+	ENDP
+
+; ix = this
+RunLengthImage_Draw4Bpp: PROC
 	ld hl,0
 	ld a,(ix + RunLengthImage.page)
 	srl a

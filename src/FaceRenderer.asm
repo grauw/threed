@@ -7,7 +7,7 @@ FaceRenderer: MACRO
 	drawCommand:
 		VDPCommand 0, 0, 0, 0, 0, 0, 0, 1, VDPCommand_LINE | VDPCommand_IMP
 	clearCommand:
-		VDPCommand 0, 0, 0, 0, 256, 212, 0, 0, VDPCommand_HMMV | VDPCommand_IMP
+		VDPCommand 0, 0, 0, 0, SCREENMODE = 6 || SCREENMODE = 7 ? 512 : 256, 212, 0, 0, VDPCommand_HMMV | VDPCommand_IMP
 	ENDM
 
 ; ix = this

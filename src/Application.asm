@@ -81,11 +81,11 @@ Application_EnterMainLoop:
 	ld (CLIKSW),a  ; disable key click
 	ld a,0
 	ld (BAKCLR),a
-	ld a,5
+	ld a,SCREENMODE
 	call VDP_InitScreen
 	call VDP_DisableSprites
 	call VDP_Enable60Hz
-	ld a,0F1H
+	ld a,0
 	call VDP_SetColor
 
 	call VDP_DisableBlank

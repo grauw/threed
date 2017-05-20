@@ -6,6 +6,7 @@
 
 DEBUG: equ 1
 R800: equ 1
+SCREENMODE: equ 5
 
 	org 100H
 
