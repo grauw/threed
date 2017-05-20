@@ -134,7 +134,6 @@ BLessThanD:
 	res 2,(ix + FaceRenderer.drawCommand + VDPCommand.argument)
 XContinue:
 	ld (ix + FaceRenderer.drawCommand + VDPCommand.nx),a
-	ld a,(ix + FaceRenderer.drawCommand + VDPCommand.nx)
 	cp (ix + FaceRenderer.drawCommand + VDPCommand.ny)
 	jr nc,NXLessThanNY
 NXGreaterThanNY:
