@@ -9,7 +9,7 @@ RunLengthImage: MACRO
 	spanCount:
 		dw RunLengthImage_HEIGHT
 	spans:
-		ds 1000H * RunLengthSpan._size
+		ds 800H * 2  ; RunLengthSpan._size
 	ENDM
 
 RunLengthSpan: MACRO
@@ -278,5 +278,217 @@ OddXNext:
 	jr nz,OddXLoop
 	dec d
 	jr nz,OddXLoop
+	ret
+	ENDP
+
+; iy = other image
+; ix = this
+RunLengthImage_DrawDelta:
+	ld c,(ix + RunLengthImage.spanCount)
+	ld b,(ix + RunLengthImage.spanCount + 1)
+	ld a,b
+	or c
+	ret z
+	exx
+	ld hl,0
+	ld e,(ix + RunLengthImage.page)
+	exx
+	ld de,RunLengthImage.spans
+	add ix,de
+	add iy,de
+	call RunLengthImage_DrawDeltaSpans
+	ret
+
+; bc = span count
+; ix = spans
+; iy = other spans
+; e' = screen page
+; hl' = x/y position
+RunLengthImage_DrawDeltaSpans: PROC
+	ld l,(ix + RunLengthSpan.length)
+	ld h,(ix + RunLengthSpan.color)
+	ld e,(iy + RunLengthSpan.length)
+	ld d,(iy + RunLengthSpan.color)
+	dec bc  ; 16-bit to 2x 8-bit loop
+	inc b
+	inc c
+	ld a,b
+	ld b,c
+OuterLoop:
+	push af
+Loop:
+	dec l
+	dec e
+	ld a,l
+	sub e
+	jr c,SmallerL
+	jr z,EqualL
+LargerL:
+	ld l,a
+	ld a,e
+	ld e,0
+	call RunLengthImage_DrawDeltaSpan
+	inc iy
+	inc iy
+	ld e,(iy + RunLengthSpan.length)
+	ld d,(iy + RunLengthSpan.color)
+	jr Loop
+EqualL:
+	ld l,a
+	ld a,e
+	ld e,l
+	call RunLengthImage_DrawDeltaSpan
+	inc iy
+	inc iy
+	ld e,(iy + RunLengthSpan.length)
+	ld d,(iy + RunLengthSpan.color)
+	inc ix
+	inc ix
+	ld l,(ix + RunLengthSpan.length)
+	ld h,(ix + RunLengthSpan.color)
+	djnz Loop
+	pop af
+	dec a
+	jr nz,OuterLoop
+	ret
+SmallerL:
+	neg
+	ld e,a
+	ld a,l
+	ld l,0
+	call RunLengthImage_DrawDeltaSpan
+	inc ix
+	inc ix
+	ld l,(ix + RunLengthSpan.length)
+	ld h,(ix + RunLengthSpan.color)
+	djnz Loop
+	pop af
+	dec a
+	jr nz,OuterLoop
+	ret
+	ENDP
+
+RunLengthImage_DrawDeltaSpan: equ SCREENMODE = 5 || SCREENMODE = 6 ? RunLengthImage_DrawDeltaSpan4Bpp : RunLengthImage_DrawDeltaSpan8Bpp
+
+; a = span length - 1
+; h = span color
+; d = other span color
+; e' = screen page
+; hl' = x/y position
+RunLengthImage_DrawDeltaSpan8Bpp: PROC
+	ex af,af'
+	ld a,h
+	cp d
+	exx
+	jr z,Advance
+Output:
+	rlc h
+	rl e
+	rlc h
+	rl e
+	ld c,VDP_PORT_1
+	di
+	out (c),e
+	ld b,VDP_REGISTER | 14
+	out (c),b
+	srl e
+	srl e
+	rrc h
+	rrc h
+	out (c),l
+	ld b,h
+	set 6,b
+	res 7,b
+	ei
+	out (c),b
+	dec c
+	ex af,af'
+	ld b,a
+	ex af,af'
+	inc b
+OutputLoop:
+	out (c),a
+	djnz OutputLoop
+Advance:
+	ex af,af'
+	ld c,a
+	ld b,0
+	inc bc
+	add hl,bc
+	exx
+	ret
+	ENDP
+
+; a = span length - 1
+; h = span color
+; d = other span color
+; d' = previous span color
+; e' = screen page, bit 7: force output
+; hl' = x/y position
+RunLengthImage_DrawDeltaSpan4Bpp: PROC
+	ex af,af'
+	ld a,h
+	cp d
+	exx
+	jr nz,Output
+	bit 7,e
+	jr z,Advance
+Output:
+	rlc h
+	rl e
+	ld c,VDP_PORT_1
+	di
+	out (c),e
+	ld b,VDP_REGISTER | 14
+	out (c),b
+	srl e
+	rrc h
+	ld b,l
+	rrc h
+	rr b
+	out (c),b
+	ld b,h
+	rlc h
+	set 6,b
+	res 7,b
+	res 7,e
+	ei
+	out (c),b
+	dec c
+	ex af,af'
+	ld b,a
+	ex af,af'
+	inc b
+	bit 0,l
+	jr z,OutputLoop
+	and 0FH
+	or d
+	out (c),a
+	exx
+	ld a,h
+	exx
+	dec b
+	jr z,Advance
+	exx
+	cp d
+	exx
+	jr z,Advance
+OutputLoop:
+	dec b
+	jr z,ForceNextAndAdvance
+	out (c),a
+	djnz OutputLoop
+	jr Advance
+ForceNextAndAdvance:
+	set 7,e
+Advance:
+	and 0F0H
+	ld d,a
+	ex af,af'
+	ld c,a
+	ld b,0
+	inc bc
+	add hl,bc
+	exx
 	ret
 	ENDP

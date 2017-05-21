@@ -4,13 +4,19 @@
 Application: MACRO
 	frame:
 		dw 0
+	image:
+		dw image_
+	altImage:
+		dw altImage_
 	pointRenderer:
 		PointRenderer
 	edgeRenderer:
 		EdgeRenderer
 	faceRenderer:
 		FaceRenderer
-	image:
+	image_:
+		RunLengthImage
+	altImage_:
 		RunLengthImage
 	ENDM
 
@@ -70,8 +76,19 @@ Application_GetFaceRenderer:
 ; ix = this
 ; ix <- image
 Application_GetImage:
-	ld de,Application.image
-	add ix,de
+	ld e,(ix + Application.image)
+	ld d,(ix + Application.image + 1)
+	ld ixl,e
+	ld ixh,d
+	ret
+
+; ix = this
+; ix <- image
+Application_GetAltImage:
+	ld e,(ix + Application.altImage)
+	ld d,(ix + Application.altImage + 1)
+	ld ixl,e
+	ld ixh,d
 	ret
 
 ; ix = this
@@ -197,7 +214,16 @@ Application_MainLoop:
 Application_DrawPoints:
 	push ix
 	call Application_GetImage
+	push ix
 	call RunLengthImage_ClearBlack
+	pop de
+	pop ix
+
+	push ix
+	push de
+	call Application_GetPointRenderer
+	pop de
+	call PointRenderer_SetImage
 	pop ix
 
 	push ix
@@ -208,9 +234,15 @@ Application_DrawPoints:
 	pop ix
 
 	push ix
+	push ix
+	call Application_GetAltImage
+	ex (sp),ix
+	pop iy
 	call Application_GetImage
-	call RunLengthImage_Draw
+	call RunLengthImage_DrawDelta
 	pop ix
+
+	call Application_SwapImages
 	ret
 
 ; ix = this
@@ -233,6 +265,19 @@ Application_DrawFaces:
 	call FaceRenderer_Draw
 	call FaceRenderer_Swap
 	pop ix
+	ret
+
+; ix = this
+; ix <- image
+Application_SwapImages:
+	ld e,(ix + Application.image)
+	ld d,(ix + Application.image + 1)
+	ld l,(ix + Application.altImage)
+	ld h,(ix + Application.altImage + 1)
+	ld (ix + Application.image),l
+	ld (ix + Application.image + 1),h
+	ld (ix + Application.altImage),e
+	ld (ix + Application.altImage + 1),d
 	ret
 
 ;

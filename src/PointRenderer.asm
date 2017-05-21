@@ -9,8 +9,7 @@ PointRenderer: MACRO
 ; de = image
 ; ix = this
 PointRenderer_Construct:
-	ld (ix + PointRenderer.image),e
-	ld (ix + PointRenderer.image + 1),d
+	call PointRenderer_SetImage
 	ret
 
 ; ix = this
@@ -20,6 +19,13 @@ PointRenderer_GetImage:
 	ld d,(ix + PointRenderer.image + 1)
 	ld ixl,e
 	ld ixh,d
+	ret
+
+; de = image
+; ix = this
+PointRenderer_SetImage:
+	ld (ix + PointRenderer.image),e
+	ld (ix + PointRenderer.image + 1),d
 	ret
 
 ; iy = points
