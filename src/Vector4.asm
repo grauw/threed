@@ -79,20 +79,15 @@ Vector4_PerspectiveDivide:
 ; bc = count
 ; ix = vector array
 Vector4_PerspectiveDivideArray: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	push bc
 	call Vector4_PerspectiveDivide
 	ld bc,Vector4._size
 	add ix,bc
 	pop bc
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP

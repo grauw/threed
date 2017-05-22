@@ -33,20 +33,15 @@ EdgeRenderer_GetClearCommand:
 ; ix = this
 EdgeRenderer_Draw: PROC
 	call EdgeRenderer_Prepare
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	push bc
 	call EdgeRenderer_DrawEdge
 	ld bc,Edge._size
 	add iy,bc
 	pop bc
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP

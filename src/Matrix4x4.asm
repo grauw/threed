@@ -183,20 +183,15 @@ Matrix4x4_MultiplyVector4:
 ; ix = this
 ; bc = count
 Matrix4x4_MultiplyVector4Array: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	push bc
 	call Matrix4x4_MultiplyVector4
 	ld bc,Vector4._size
 	add iy,bc
 	pop bc
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP

@@ -33,20 +33,15 @@ PointRenderer_SetImage:
 ; ix = this
 PointRenderer_Draw: PROC
 	call PointRenderer_Prepare
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	push bc
 	call PointRenderer_DrawPoint
 	pop bc
 	ld de,Point._size
 	add iy,de
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP

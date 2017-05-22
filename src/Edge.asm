@@ -51,12 +51,6 @@ NoSwap:
 ; bc = count
 ; ix = this
 Edge_PrepareArray: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	push bc
 	call Edge_Prepare
@@ -65,8 +59,9 @@ Loop:
 	ld de,Edge._size
 	add ix,de
 	ex de,hl
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP
@@ -90,20 +85,15 @@ Edge_BakeVertices:
 ; de = vertices
 ; ix = this
 Edge_BakeArrayVertices: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	call Edge_BakeVertices
 	ex de,hl
 	ld de,Edge._size
 	add ix,de
 	ex de,hl
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP

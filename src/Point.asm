@@ -30,12 +30,6 @@ Point_Prepare: PROC
 ; de = vertices
 ; ix = this
 Point_PrepareArray: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	push bc
 	call Point_Prepare
@@ -44,8 +38,9 @@ Loop:
 	ld de,Point._size
 	add ix,de
 	ex de,hl
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP
@@ -64,20 +59,15 @@ Point_BakeVertices:
 ; de = vertices
 ; ix = this
 Point_BakeArrayVertices: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	call Point_BakeVertices
 	ex de,hl
 	ld de,Point._size
 	add ix,de
 	ex de,hl
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP

@@ -37,20 +37,15 @@ Face_BakeVertices:
 ; de = vertices
 ; ix = this
 Face_BakeArrayVertices: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	call Face_BakeVertices
 	ex de,hl
 	ld de,Face._size
 	add ix,de
 	ex de,hl
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP

@@ -32,12 +32,6 @@ FaceRenderer_GetClearCommand:
 ; iy = faces
 ; ix = this
 FaceRenderer_Draw: PROC
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
-	ld c,a
 Loop:
 	push bc
 	push ix
@@ -65,8 +59,9 @@ Loop:
 	ld bc,Face._size
 	add iy,bc
 	pop bc
-	djnz Loop
-	dec c
+	dec bc
+	ld a,b
+	or c
 	jr nz,Loop
 	ret
 	ENDP
