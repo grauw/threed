@@ -10,6 +10,8 @@ Point: MACRO ?vertex, ?color
 		db 0
 	y:
 		db 0
+	next:
+		dw 0
 	_size:
 	ENDM
 
