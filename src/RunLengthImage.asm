@@ -188,6 +188,41 @@ Found:
 	ret
 	ENDP
 
+; hl = span buffer
+; ix = this
+RunLengthImage_PlotSpanBuffer: PROC
+	ex de,hl
+	ld c,ixl
+	ld b,ixh
+	ld hl,RunLengthImage.spans
+	add hl,bc
+	ld c,(ix + RunLengthImage.spanCount)
+	ld b,(ix + RunLengthImage.spanCount + 1)
+	add hl,bc
+	add hl,bc
+	ex de,hl
+Loop:
+	ld a,(hl)
+	sub l
+	inc h
+	inc h
+	ld (de),a
+	inc de
+	ld a,(hl)
+	dec h
+	dec h
+	ld (de),a
+	inc de
+	inc bc
+	ld l,(hl)
+	inc l
+	dec l
+	jr nz,Loop
+	ld (ix + RunLengthImage.spanCount),c
+	ld (ix + RunLengthImage.spanCount + 1),b
+	ret
+	ENDP
+
 RunLengthImage_Draw: equ SCREENMODE = 5 || SCREENMODE = 6 ? RunLengthImage_Draw4Bpp : RunLengthImage_Draw8Bpp
 
 ; ix = this

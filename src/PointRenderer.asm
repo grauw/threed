@@ -4,6 +4,8 @@
 PointRenderer: MACRO
 	image:
 		dw 0
+	spanBuffer:
+		dw SpanBuffer_instance
 	buckets:
 		ds 212 * 2
 	ENDM
@@ -107,14 +109,18 @@ PointRenderer_DrawScanlines: PROC
 	add hl,de
 	ld b,212
 Loop:
+	push bc
 	ld e,(hl)
 	inc hl
 	ld d,(hl)
 	inc hl
+	push hl
+	ld l,(ix + PointRenderer.spanBuffer)
+	ld h,(ix + PointRenderer.spanBuffer + 1)
+	call SpanBuffer_Init
 	inc d
 	dec d
 	jr z,Next
-	push bc
 	push hl
 PointLoop:
 	ld iyl,e
@@ -126,20 +132,24 @@ PointLoop:
 	or d
 	jr nz,PointLoop
 	pop hl
-	pop bc
 Next:
+	push ix
+	call PointRenderer_GetImage
+	call RunLengthImage_PlotSpanBuffer
+	pop ix
+	pop hl
+	pop bc
 	djnz Loop
 	ret
 	ENDP
 
+; hl = span buffer (l is insignificant, assumed 0)
 ; iy = point
-; ix = this
 PointRenderer_DrawPoint:
-	push ix
-	call PointRenderer_GetImage
-	ld e,(iy + Point.x)
-	ld d,(iy + Point.y)
-	ld a,(iy + Point.color)
-	call RunLengthImage_Pset
-	pop ix
+	ld d,(iy + Point.x)
+	ld e,d
+	inc e
+	ld b,(iy + Point.z)
+	ld c,(iy + Point.color)
+	call SpanBuffer_Insert
 	ret

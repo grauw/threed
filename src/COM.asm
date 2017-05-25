@@ -39,6 +39,7 @@ COM_Main:
 	INCLUDE "Vector4.asm"
 	INCLUDE "Matrix4x4.asm"
 	INCLUDE "RunLengthImage.asm"
+	INCLUDE "SpanBuffer.asm"
 	INCLUDE "Point.asm"
 	INCLUDE "PointRenderer.asm"
 	INCLUDE "Edge.asm"

@@ -215,7 +215,7 @@ Application_DrawPoints:
 	push ix
 	call Application_GetImage
 	push ix
-	call RunLengthImage_ClearBlack
+	call RunLengthImage_Clear
 	pop de
 	pop ix
 

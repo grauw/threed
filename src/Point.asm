@@ -10,6 +10,8 @@ Point: MACRO ?vertex, ?color
 		db 0
 	y:
 		db 0
+	z:
+		db 0
 	next:
 		dw 0
 	_size:
@@ -23,8 +25,10 @@ Point_Prepare: PROC
 	ld iyh,b
 	ld l,(iy + Vector4.x)
 	ld h,(iy + Vector4.y)
+	ld c,(iy + Vector4.z)
 	ld (ix + Point.x),l
 	ld (ix + Point.y),h
+	ld (ix + Point.z),c
 	ret
 	ENDP
 
