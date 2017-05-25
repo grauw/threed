@@ -96,14 +96,22 @@ EndSplit:
 	ld (hl),a
 EndNoSplit:
 	pop bc
-	ld l,d
-	ld (hl),e
+	ld a,d
+FillLoop:
+	ld l,a
 	inc h
+	ld a,(hl)
+	cp b
+	jr c,FillLoopNext
 	ld (hl),b
 	inc h
 	ld (hl),c
 	dec h
+FillLoopNext:
 	dec h
+	ld a,(hl)
+	cp e
+	jr nz,FillLoop
 	ld l,0
 	ret
 	ENDP
