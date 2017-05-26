@@ -32,10 +32,24 @@ PointRenderer_SetImage:
 	ld (ix + PointRenderer.image + 1),d
 	ret
 
+; ix = this
+PointRenderer_Clear:
+	ld hl,PointRenderer.buckets
+	ld e,ixl
+	ld d,ixh
+	add hl,de
+	ld e,l
+	ld d,h
+	inc de
+	ld (hl),0
+	ld bc,212 * 2 - 1
+	ldir
+	ret
+
 ; iy = points
 ; bc = count
 ; ix = this
-PointRenderer_Draw:
+PointRenderer_AddPoints:
 	push bc
 	push ix
 	push iy
@@ -50,7 +64,6 @@ PointRenderer_Draw:
 	call PointRenderer_BucketSortPoints
 	pop iy
 	pop bc
-	call PointRenderer_DrawScanlines
 	ret
 
 ; bc = count
@@ -61,16 +74,6 @@ PointRenderer_BucketSortPoints: PROC
 	ld e,ixl
 	ld d,ixh
 	add hl,de
-	push bc
-	push hl
-	ld e,l
-	ld d,h
-	inc de
-	ld (hl),0
-	ld bc,212 * 2 - 1
-	ldir
-	pop hl
-	pop bc
 Loop:
 	ld a,(iy + Point.y)
 	cp 212
@@ -102,7 +105,7 @@ Next:
 	ENDP
 
 ; ix = this
-PointRenderer_DrawScanlines: PROC
+PointRenderer_Draw: PROC
 	ld hl,PointRenderer.buckets
 	ld e,ixl
 	ld d,ixh

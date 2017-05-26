@@ -224,12 +224,14 @@ Application_DrawPoints:
 	call Application_GetPointRenderer
 	pop de
 	call PointRenderer_SetImage
+	call PointRenderer_Clear
 	pop ix
 
 	push ix
 	ld iy,Application_points
 	ld bc,Application_points_COUNT
 	call Application_GetPointRenderer
+	call PointRenderer_AddPoints
 	call PointRenderer_Draw
 	pop ix
 
