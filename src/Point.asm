@@ -77,3 +77,21 @@ Loop:
 	jr nz,Loop
 	ret
 	ENDP
+
+; hl = span buffer (l is insignificant, assumed 0)
+; iy = this
+Point_Draw_IY:
+	ld d,(iy + Point.x)
+	ld e,d
+	inc e
+	ld b,(iy + Point.z)
+	ld c,(iy + Point.color)
+	call SpanBuffer_Insert
+	ld e,(iy + Point.next)
+	ld d,(iy + Point.next + 1)
+	ld a,e
+	or d
+	ret z
+	ld iyl,e
+	ld iyh,d
+	jr Point_Draw_IY

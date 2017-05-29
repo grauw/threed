@@ -127,39 +127,19 @@ Loop:
 
 ; de = points
 ; ix = this
-PointRenderer_DrawScanline: PROC
+PointRenderer_DrawScanline:
 	ld l,(ix + PointRenderer.spanBuffer)
 	ld h,(ix + PointRenderer.spanBuffer + 1)
 	call SpanBuffer_Init
+	push hl
 	inc d
 	dec d
-	jr z,Next
-	push hl
-Loop:
 	ld iyl,e
 	ld iyh,d
-	call PointRenderer_DrawPoint
-	ld e,(iy + Point.next)
-	ld d,(iy + Point.next + 1)
-	ld a,e
-	or d
-	jr nz,Loop
+	call nz,Point_Draw_IY
 	pop hl
-Next:
 	push ix
 	call PointRenderer_GetImage
 	call RunLengthImage_PlotSpanBuffer
 	pop ix
-	ret
-	ENDP
-
-; hl = span buffer (l is insignificant, assumed 0)
-; iy = point
-PointRenderer_DrawPoint:
-	ld d,(iy + Point.x)
-	ld e,d
-	inc e
-	ld b,(iy + Point.z)
-	ld c,(iy + Point.color)
-	call SpanBuffer_Insert
 	ret
