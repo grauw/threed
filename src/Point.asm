@@ -2,48 +2,41 @@
 ; A point
 ;
 Point: MACRO ?vertex, ?color
-	vertex:
-		dw ?vertex * Vector4._size
-	color:
-		db ?color
+	super: Renderable Point_Render
+	y: equ super.y
 	x:
-		db 0
-	y:
 		db 0
 	z:
 		db 0
-	next:
-		dw 0
+	color:
+		db ?color
+	vertex:
+		dw ?vertex * Vector4._size
 	_size:
 	ENDM
 
 ; ix = this
 Point_Prepare: PROC
-	ld c,(ix + Point.vertex)
-	ld b,(ix + Point.vertex + 1)
-	ld iyl,c
-	ld iyh,b
-	ld l,(iy + Vector4.x)
-	ld h,(iy + Vector4.y)
-	ld c,(iy + Vector4.z)
-	ld (ix + Point.x),l
-	ld (ix + Point.y),h
-	ld (ix + Point.z),c
+	ld e,(ix + Point.vertex)
+	ld d,(ix + Point.vertex + 1)
+	ld iyl,e
+	ld iyh,d
+	ld e,(iy + Vector4.x)
+	ld d,(iy + Vector4.y)
+	ld a,(iy + Vector4.z)
+	ld (ix + Point.x),e
+	ld (ix + Point.y),d
+	ld (ix + Point.z),a
 	ret
 	ENDP
 
 ; bc = count
-; de = vertices
 ; ix = this
 Point_PrepareArray: PROC
 Loop:
-	push bc
 	call Point_Prepare
-	pop bc
-	ex de,hl
 	ld de,Point._size
 	add ix,de
-	ex de,hl
 	dec bc
 	ld a,b
 	or c
@@ -80,18 +73,11 @@ Loop:
 
 ; hl = span buffer (l is insignificant, assumed 0)
 ; iy = this
-Point_Draw_IY:
-	ld d,(iy + Point.x)
+Point_Render:
+	ld d,(ix + Point.x)
 	ld e,d
 	inc e
-	ld b,(iy + Point.z)
-	ld c,(iy + Point.color)
+	ld b,(ix + Point.z)
+	ld c,(ix + Point.color)
 	call SpanBuffer_Insert
-	ld e,(iy + Point.next)
-	ld d,(iy + Point.next + 1)
-	ld a,e
-	or d
-	ret z
-	ld iyl,e
-	ld iyh,d
-	jr Point_Draw_IY
+	jp Renderable_Next

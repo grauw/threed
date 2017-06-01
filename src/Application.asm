@@ -8,8 +8,8 @@ Application: MACRO
 		dw image_
 	altImage:
 		dw altImage_
-	pointRenderer:
-		PointRenderer
+	rasterizer:
+		Rasterizer
 	edgeRenderer:
 		EdgeRenderer
 	faceRenderer:
@@ -46,16 +46,16 @@ Application_Construct:
 	push ix
 	call Application_GetImage
 	ex (sp),ix
-	call Application_GetPointRenderer
+	call Application_GetRasterizer
 	pop de
-	call PointRenderer_Construct
+	call Rasterizer_Construct
 	pop ix
 	ret
 
 ; ix = this
-; ix <- point renderer
-Application_GetPointRenderer:
-	ld de,Application.pointRenderer
+; ix <- rasterizer
+Application_GetRasterizer:
+	ld de,Application.rasterizer
 	add ix,de
 	ret
 
@@ -197,7 +197,7 @@ Application_MainLoop:
 	call Vector4_PerspectiveDivideArray
 	pop ix
 
-	call Application_DrawPoints
+	call Application_Draw
 ;	call Application_DrawEdges
 ;	call Application_DrawFaces
 
@@ -211,7 +211,7 @@ Application_MainLoop:
 	ret
 
 ; ix = this
-Application_DrawPoints:
+Application_Draw:
 	push ix
 	call Application_GetImage
 	push ix
@@ -221,18 +221,29 @@ Application_DrawPoints:
 
 	push ix
 	push de
-	call Application_GetPointRenderer
+	call Application_GetRasterizer
 	pop de
-	call PointRenderer_SetImage
-	call PointRenderer_Clear
+	call Rasterizer_SetImage
+	call Rasterizer_Clear
 	pop ix
 
 	push ix
+	ld ix,Application_points
+	ld bc,Application_points_COUNT
+	call Point_PrepareArray
+	pop ix
+
+	push ix
+	call Application_GetRasterizer
 	ld iy,Application_points
 	ld bc,Application_points_COUNT
-	call Application_GetPointRenderer
-	call PointRenderer_AddPoints
-	call PointRenderer_Draw
+	ld de,Point._size
+	call Rasterizer_AddArray
+	pop ix
+
+	push ix
+	call Application_GetRasterizer
+	call Rasterizer_StartRender
 	pop ix
 
 	push ix
