@@ -115,6 +115,29 @@ NoAdd:
 	ret
 	ENDP
 
+; e = dividend
+; c = divisor
+; a = quotient
+; b = remainder
+; Modifies: e
+Math_Divide8x8: PROC
+	xor a
+	ld b,8
+Loop:
+	rl e
+	rla
+	sub c
+	jr nc,NoAdd
+	add a,c
+NoAdd:
+	djnz Loop
+	ld b,a
+	ld a,e
+	rla
+	cpl
+	ret
+	ENDP
+
 ; hlbc = dividend
 ; de = divisor
 ; bc <- quotient

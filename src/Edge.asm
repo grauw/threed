@@ -1,38 +1,50 @@
 ;
+; An edge
 ;
-;
-Edge: MACRO ?one, ?two, ?color
-	one:
-		dw ?one * Vector4._size
-	two:
-		dw ?two * Vector4._size
-	color:
-		db ?color
+Edge: MACRO ?vertex1, ?vertex2, ?color
+	super: Renderable Edge_Render
+	y: equ super.y
 	x:
 		db 0
-	y:
+	z:
+		db 0
+	height:
 		db 0
 	dx:
 		db 0
 	dy:
 		db 0
+	stepx:
+		db 0
+	error:
+		db 0
+	color:
+		db ?color
+	vertex1:
+		dw ?vertex1 * Vector4._size
+	vertex2:
+		dw ?vertex2 * Vector4._size
 	_size:
 	ENDM
 
 ; ix = this
 Edge_Prepare: PROC
-	ld c,(ix + Edge.one)
-	ld b,(ix + Edge.one + 1)
+	ld c,(ix + Edge.vertex1)
+	ld b,(ix + Edge.vertex1 + 1)
 	ld iyl,c
 	ld iyh,b
 	ld l,(iy + Vector4.x)
 	ld h,(iy + Vector4.y)
-	ld c,(ix + Edge.two)
-	ld b,(ix + Edge.two + 1)
+	ld a,(iy + Vector4.z)
+	ld c,(ix + Edge.vertex2)
+	ld b,(ix + Edge.vertex2 + 1)
 	ld iyl,c
 	ld iyh,b
 	ld e,(iy + Vector4.x)
 	ld d,(iy + Vector4.y)
+	add a,(iy + Vector4.z)
+	rr a
+	ld (ix + Edge.z),a
 	ld a,d
 	sub h
 	jr nc,NoSwap
@@ -41,10 +53,37 @@ Edge_Prepare: PROC
 NoSwap:
 	ld (ix + Edge.x),l
 	ld (ix + Edge.y),h
+	inc a
+	ld (ix + Edge.height),a
+	dec a
 	ld (ix + Edge.dy),a
+	ld c,a
 	ld a,e
 	sub l
-	ld (ix + Edge.dx),a
+	jr c,Left
+	ld e,a
+	call Math_Divide8x8
+	ld (ix + Edge.stepx),a
+	ld (ix + Edge.dx),b
+	xor a
+	srl c
+	sbc a,c
+	ld (ix + Edge.error),a
+	ld (ix + Edge.super.render),Edge_Render & 0FFH
+	ld (ix + Edge.super.render + 1),Edge_Render >> 8
+	ret
+Left:
+	neg
+	ld e,a
+	call Math_Divide8x8
+	ld (ix + Edge.stepx),a
+	ld (ix + Edge.dx),b
+	xor a
+	srl c
+	sbc a,c
+	ld (ix + Edge.error),a
+	ld (ix + Edge.super.render),Edge_RenderLeft & 0FFH
+	ld (ix + Edge.super.render + 1),Edge_RenderLeft >> 8
 	ret
 	ENDP
 
@@ -69,16 +108,16 @@ Loop:
 ; de = vertices
 ; ix = this
 Edge_BakeVertices:
-	ld l,(ix + Edge.one)
-	ld h,(ix + Edge.one + 1)
+	ld l,(ix + Edge.vertex1)
+	ld h,(ix + Edge.vertex1 + 1)
 	add hl,de
-	ld (ix + Edge.one),l
-	ld (ix + Edge.one + 1),h
-	ld l,(ix + Edge.two)
-	ld h,(ix + Edge.two + 1)
+	ld (ix + Edge.vertex1),l
+	ld (ix + Edge.vertex1 + 1),h
+	ld l,(ix + Edge.vertex2)
+	ld h,(ix + Edge.vertex2 + 1)
 	add hl,de
-	ld (ix + Edge.two),l
-	ld (ix + Edge.two + 1),h
+	ld (ix + Edge.vertex2),l
+	ld (ix + Edge.vertex2 + 1),h
 	ret
 
 ; bc = count
@@ -96,4 +135,54 @@ Loop:
 	or c
 	jr nz,Loop
 	ret
+	ENDP
+
+; hl = span buffer (l is insignificant, assumed 0)
+; iy = this
+Edge_Render: PROC
+	ld d,(ix + Edge.x)
+	ld e,d
+	inc e
+	ld b,(ix + Edge.z)
+	ld c,(ix + Edge.color)
+	call SpanBuffer_Insert
+	ld a,(ix + Edge.x)
+	add a,(ix + Edge.stepx)
+	ld c,a
+	ld a,(ix + Edge.error)
+	add a,(ix + Edge.dx)
+	jr nc,NoOverflow
+	inc c
+	sub (ix + Edge.dy)
+NoOverflow:
+	ld (ix + Edge.error),a
+	ld (ix + Edge.x),c
+	dec (ix + Edge.height)
+	jp nz,Renderable_Advance
+	jp Renderable_Next
+	ENDP
+
+; hl = span buffer (l is insignificant, assumed 0)
+; iy = this
+Edge_RenderLeft: PROC
+	ld d,(ix + Edge.x)
+	ld e,d
+	inc e
+	ld b,(ix + Edge.z)
+	ld c,(ix + Edge.color)
+	call SpanBuffer_Insert
+	ld a,(ix + Edge.x)
+	sub (ix + Edge.stepx)
+	ld c,a
+	ld a,(ix + Edge.error)
+	add a,(ix + Edge.dx)
+	jr nc,NoOverflow
+	dec c
+	sub (ix + Edge.dy)
+NoOverflow:
+	ld (ix + Edge.error),a
+	ld (ix + Edge.x),c
+	dec (ix + Edge.height)
+	jp nz,Renderable_Advance
+	jp Renderable_Next
 	ENDP

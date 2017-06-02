@@ -44,7 +44,6 @@ COM_Main:
 	INCLUDE "Rasterizer.asm"
 	INCLUDE "Point.asm"
 	INCLUDE "Edge.asm"
-	INCLUDE "EdgeRenderer.asm"
 	INCLUDE "Face.asm"
 	INCLUDE "FaceRenderer.asm"
 

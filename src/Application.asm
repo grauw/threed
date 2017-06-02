@@ -10,8 +10,6 @@ Application: MACRO
 		dw altImage_
 	rasterizer:
 		Rasterizer
-	edgeRenderer:
-		EdgeRenderer
 	faceRenderer:
 		FaceRenderer
 	image_:
@@ -56,13 +54,6 @@ Application_Construct:
 ; ix <- rasterizer
 Application_GetRasterizer:
 	ld de,Application.rasterizer
-	add ix,de
-	ret
-
-; ix = this
-; ix <- edge renderer
-Application_GetEdgeRenderer:
-	ld de,Application.edgeRenderer
 	add ix,de
 	ret
 
@@ -198,7 +189,6 @@ Application_MainLoop:
 	pop ix
 
 	call Application_Draw
-;	call Application_DrawEdges
 ;	call Application_DrawFaces
 
 	ld l,(ix + Application.frame)
@@ -234,6 +224,20 @@ Application_Draw:
 	pop ix
 
 	push ix
+	ld ix,Application_edges
+	ld bc,Application_edges_COUNT
+	call Edge_PrepareArray
+	pop ix
+
+	push ix
+	call Application_GetRasterizer
+	ld iy,Application_edges
+	ld bc,Application_edges_COUNT
+	ld de,Edge._size
+	call Rasterizer_AddArray
+	pop ix
+
+	push ix
 	call Application_GetRasterizer
 	ld iy,Application_points
 	ld bc,Application_points_COUNT
@@ -256,17 +260,6 @@ Application_Draw:
 	pop ix
 
 	call Application_SwapImages
-	ret
-
-; ix = this
-Application_DrawEdges:
-	push ix
-	ld iy,Application_edges
-	ld bc,Application_edges_COUNT
-	call Application_GetEdgeRenderer
-	call EdgeRenderer_Draw
-	call EdgeRenderer_Swap
-	pop ix
 	ret
 
 ; ix = this
@@ -323,20 +316,26 @@ Application_points:
 Application_points_COUNT: equ 8
 
 Application_edges:
-	Edge 0, 1, 5
-	Edge 1, 2, 5
-	Edge 2, 3, 5
-	Edge 3, 0, 5
-	Edge 0, 4, 8
-	Edge 1, 5, 8
-	Edge 2, 6, 8
-	Edge 3, 7, 8
-	Edge 4, 5, 12
-	Edge 5, 6, 12
-	Edge 6, 7, 12
-	Edge 7, 4, 12
+	Edge 0, 1, 55H
+	Edge 1, 2, 55H
+	Edge 2, 3, 55H
+	Edge 3, 0, 55H
+	Edge 0, 2, 55H
+	Edge 0, 4, 88H
+	Edge 1, 5, 88H
+	Edge 2, 6, 88H
+	Edge 3, 7, 88H
+	Edge 0, 5, 88H
+	Edge 1, 6, 88H
+	Edge 2, 7, 88H
+	Edge 3, 4, 88H
+	Edge 4, 5, 0CCH
+	Edge 5, 6, 0CCH
+	Edge 6, 7, 0CCH
+	Edge 7, 4, 0CCH
+	Edge 5, 7, 0CCH
 
-Application_edges_COUNT: equ 12
+Application_edges_COUNT: equ 18
 
 Application_faces:
 	Face 0, 4, 7, 8
