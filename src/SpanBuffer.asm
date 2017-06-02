@@ -33,17 +33,22 @@ SpanBuffer_Init:
 	dec h
 	ret
 
-; d = x
-; e = next x
+; d = x1
+; e = x2
 ; b = z
 ; c = color
 ; hl = this
-; Modifies: af
+; Modifies: af, e, d
 SpanBuffer_Insert: PROC
 	ld a,e
+	cp d
+	ret z
 	dec a
 	cp d
-	call c,System_ThrowException
+	jr nc,NoSwap
+	inc d
+	ld e,d
+	ld d,a
 NoSwap:
 	push bc
 	xor a
