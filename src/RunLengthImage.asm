@@ -276,6 +276,7 @@ RunLengthImage_DrawDeltaSpan: equ SCREENMODE = 5 || SCREENMODE = 6 ? RunLengthIm
 ; h = span color
 ; d = other span color
 ; e' = screen page
+;      bit 6: address changed since last output (nonsequential output)
 ; hl' = x/y position
 RunLengthImage_DrawDeltaSpan8Bpp: PROC
 	ex af,af'
@@ -284,11 +285,36 @@ RunLengthImage_DrawDeltaSpan8Bpp: PROC
 	exx
 	jr z,Advance
 Output:
-	rlc h
-	rl e
-	rlc h
-	rl e
+	ex af,af'
+	ld b,a
+	ex af,af'
+	inc b
+OutputLoop:
+	call VDPWrite
+	djnz OutputLoop
+	jr AdvanceNoSetAddress
+Advance:
+	res 6,e
+AdvanceNoSetAddress:
+	ex af,af'
+	ld c,a
+	ld b,0
+	inc bc
+	add hl,bc
+	exx
+	ret
+VDPWrite:
+	bit 6,e
+	call z,VDPWrite_SetAddress
+	out (VDP_PORT_0),a
+	ret
+VDPWrite_SetAddress:
+	push bc
 	ld c,VDP_PORT_1
+	rlc h
+	rl e
+	rlc h
+	rl e
 	di
 	out (c),e
 	ld b,VDP_REGISTER | 14
@@ -301,23 +327,10 @@ Output:
 	ld b,h
 	set 6,b
 	res 7,b
+	set 6,e
 	ei
 	out (c),b
-	dec c
-	ex af,af'
-	ld b,a
-	ex af,af'
-	inc b
-OutputLoop:
-	out (c),a
-	djnz OutputLoop
-Advance:
-	ex af,af'
-	ld c,a
-	ld b,0
-	inc bc
-	add hl,bc
-	exx
+	pop bc
 	ret
 	ENDP
 
@@ -325,7 +338,9 @@ Advance:
 ; h = span color
 ; d = other span color
 ; d' = previous span color
-; e' = screen page, bit 7: force output
+; e' = screen page
+;      bit 7: force output
+;      bit 6: address changed since last output (nonsequential output)
 ; hl' = x/y position
 RunLengthImage_DrawDeltaSpan4Bpp: PROC
 	ex af,af'
@@ -335,10 +350,57 @@ RunLengthImage_DrawDeltaSpan4Bpp: PROC
 	jr nz,Output
 	bit 7,e
 	jr z,Advance
+	res 7,e
 Output:
+	ex af,af'
+	ld b,a
+	ex af,af'
+	inc b
+	bit 0,l
+	jr z,OutputLoop
+	and 0FH
+	or d
+	call VDPWrite
+	exx
+	ld a,h
+	exx
+	dec b
+	jr z,Advance
+	exx
+	cp d
+	exx
+	jr z,Advance
+OutputLoop:
+	dec b
+	jr z,ForceNextAndAdvance
+	call VDPWrite
+	djnz OutputLoop
+	jr AdvanceNoSetAddress
+ForceNextAndAdvance:
+	set 7,e
+	jr AdvanceNoSetAddress
+Advance:
+	res 6,e
+AdvanceNoSetAddress:
+	and 0F0H
+	ld d,a
+	ex af,af'
+	ld c,a
+	ld b,0
+	inc bc
+	add hl,bc
+	exx
+	ret
+VDPWrite:
+	bit 6,e
+	call z,VDPWrite_SetAddress
+	out (VDP_PORT_0),a
+	ret
+VDPWrite_SetAddress:
+	push bc
+	ld c,VDP_PORT_1
 	rlc h
 	rl e
-	ld c,VDP_PORT_1
 	di
 	out (c),e
 	ld b,VDP_REGISTER | 14
@@ -353,44 +415,9 @@ Output:
 	rlc h
 	set 6,b
 	res 7,b
-	res 7,e
+	set 6,e
 	ei
 	out (c),b
-	dec c
-	ex af,af'
-	ld b,a
-	ex af,af'
-	inc b
-	bit 0,l
-	jr z,OutputLoop
-	and 0FH
-	or d
-	out (c),a
-	exx
-	ld a,h
-	exx
-	dec b
-	jr z,Advance
-	exx
-	cp d
-	exx
-	jr z,Advance
-OutputLoop:
-	dec b
-	jr z,ForceNextAndAdvance
-	out (c),a
-	djnz OutputLoop
-	jr Advance
-ForceNextAndAdvance:
-	set 7,e
-Advance:
-	and 0F0H
-	ld d,a
-	ex af,af'
-	ld c,a
-	ld b,0
-	inc bc
-	add hl,bc
-	exx
+	pop bc
 	ret
 	ENDP
