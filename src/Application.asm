@@ -137,6 +137,20 @@ Application_MainLoop:
 	push ix
 	ld l,(ix + Application.frame)
 	ld h,(ix + Application.frame + 1)
+	ld e,l
+	ld d,0
+	add hl,hl
+	add hl,hl
+	add hl,de
+	call Math_Sine
+	ld ix,Application_rotation
+	ld (ix + Matrix4x4.row2 + Vector4.w),e
+	ld (ix + Matrix4x4.row2 + Vector4.w + 1),d
+	pop ix
+
+	push ix
+	ld l,(ix + Application.frame)
+	ld h,(ix + Application.frame + 1)
 	add hl,hl
 	ld h,0
 	add hl,hl
