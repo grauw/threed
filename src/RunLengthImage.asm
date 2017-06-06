@@ -192,8 +192,15 @@ RunLengthImage_DrawDelta:
 	or c
 	ret z
 	exx
-	ld hl,0
 	ld e,(ix + RunLengthImage.page)
+	IF SCREENMODE = 5 || SCREENMODE = 6
+	sla e
+	ld hl,8000H
+	ELSE
+	sla e
+	sla e
+	ld hl,0C000H
+	ENDIF
 	exx
 	ld de,RunLengthImage.spans
 	add ix,de
@@ -277,6 +284,7 @@ RunLengthImage_DrawDeltaSpan: equ SCREENMODE = 5 || SCREENMODE = 6 ? RunLengthIm
 ; d = other span color
 ; e' = screen page
 ;      bit 6: address changed since last output (nonsequential output)
+;      bit 5: address bits 14-17 changed (r#14)
 ; hl' = x/y position
 RunLengthImage_DrawDeltaSpan8Bpp: PROC
 	ex af,af'
@@ -302,6 +310,13 @@ AdvanceNoSetAddress:
 	inc bc
 	add hl,bc
 	exx
+	ret nc
+	exx
+	set 6,h
+	res 7,h
+	inc e
+	res 5,e
+	exx
 	ret
 VDPWrite:
 	bit 6,e
@@ -311,25 +326,21 @@ VDPWrite:
 VDPWrite_SetAddress:
 	push bc
 	ld c,VDP_PORT_1
-	rlc h
-	rl e
-	rlc h
-	rl e
+	bit 5,e
+	jr nz,VDPWrite_SetAddressNoR14
 	di
 	out (c),e
 	ld b,VDP_REGISTER | 14
 	out (c),b
-	srl e
-	srl e
-	rrc h
-	rrc h
+	set 5,e
+VDPWrite_SetAddressNoR14:
+	di
 	out (c),l
-	ld b,h
-	set 6,b
-	res 7,b
+	res 7,h
 	set 6,e
 	ei
-	out (c),b
+	out (c),h
+	set 7,h
 	pop bc
 	ret
 	ENDP
@@ -341,6 +352,7 @@ VDPWrite_SetAddress:
 ; e' = screen page
 ;      bit 7: force output
 ;      bit 6: address changed since last output (nonsequential output)
+;      bit 5: address bits 14-17 changed (r#14)
 ; hl' = x/y position
 RunLengthImage_DrawDeltaSpan4Bpp: PROC
 	ex af,af'
@@ -390,6 +402,12 @@ AdvanceNoSetAddress:
 	inc bc
 	add hl,bc
 	exx
+	ret nc
+	exx
+	set 7,h
+	inc e
+	res 5,e
+	exx
 	ret
 VDPWrite:
 	bit 6,e
@@ -399,21 +417,21 @@ VDPWrite:
 VDPWrite_SetAddress:
 	push bc
 	ld c,VDP_PORT_1
-	rlc h
-	rl e
+	bit 5,e
+	jr nz,VDPWrite_SetAddressNoR14
 	di
 	out (c),e
 	ld b,VDP_REGISTER | 14
 	out (c),b
-	srl e
-	rrc h
+	set 5,e
+VDPWrite_SetAddressNoR14:
 	ld b,l
 	rrc h
 	rr b
+	di
 	out (c),b
 	ld b,h
 	rlc h
-	set 6,b
 	res 7,b
 	set 6,e
 	ei
