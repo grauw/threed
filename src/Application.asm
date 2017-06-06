@@ -10,8 +10,6 @@ Application: MACRO
 		dw altImage_
 	rasterizer:
 		Rasterizer
-	faceRenderer:
-		FaceRenderer
 	image_:
 		RunLengthImage
 	altImage_:
@@ -54,13 +52,6 @@ Application_Construct:
 ; ix <- rasterizer
 Application_GetRasterizer:
 	ld de,Application.rasterizer
-	add ix,de
-	ret
-
-; ix = this
-; ix <- face renderer
-Application_GetFaceRenderer:
-	ld de,Application.faceRenderer
 	add ix,de
 	ret
 
@@ -203,7 +194,6 @@ Application_MainLoop:
 	pop ix
 
 	call Application_Draw
-;	call Application_DrawFaces
 
 	ld l,(ix + Application.frame)
 	ld h,(ix + Application.frame + 1)
@@ -244,6 +234,20 @@ Application_Draw:
 	pop ix
 
 	push ix
+	ld ix,Application_faces
+	ld bc,Application_faces_COUNT
+	call Face_PrepareArray
+	pop ix
+
+	push ix
+	call Application_GetRasterizer
+	ld iy,Application_faces
+	ld bc,Application_faces_COUNT
+	ld de,Face._size
+	call Rasterizer_AddArray
+	pop ix
+
+	push ix
 	call Application_GetRasterizer
 	ld iy,Application_edges
 	ld bc,Application_edges_COUNT
@@ -274,17 +278,6 @@ Application_Draw:
 	pop ix
 
 	call Application_SwapImages
-	ret
-
-; ix = this
-Application_DrawFaces:
-	push ix
-	ld iy,Application_faces
-	ld bc,Application_faces_COUNT
-	call Application_GetFaceRenderer
-	call FaceRenderer_Draw
-	call FaceRenderer_Swap
-	pop ix
 	ret
 
 ; ix = this
