@@ -23,13 +23,11 @@ Point_Prepare: PROC
 	ld iyl,e
 	ld iyh,d
 	ld e,(iy + Vector4.x)
-	ld d,(iy + Vector4.y)
 	ld a,(iy + Vector4.z)
 	ld (ix + Point.x),e
-	ld (ix + Point.y),d
 	ld (ix + Point.z),a
+	ld e,(iy + Vector4.y)
 	pop iy
-	ld e,d
 	call Rasterizer_Add_IY
 	ret
 	ENDP

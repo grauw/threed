@@ -5,8 +5,6 @@ Edge: MACRO ?vertex1, ?vertex2, ?color
 	super: Renderable Edge_Render
 	x:
 		db 0
-	y:
-		db 0
 	z:
 		db 0
 	height:
@@ -55,7 +53,6 @@ Edge_Prepare: PROC
 	neg
 NoSwap:
 	ld (ix + Edge.x),l
-	ld (ix + Edge.y),h
 	inc a
 	ld (ix + Edge.height),a
 	dec a
