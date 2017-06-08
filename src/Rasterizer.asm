@@ -5,6 +5,8 @@ Rasterizer_HEIGHT: equ 212
 
 Rasterizer: MACRO
 	super: Renderable Rasterizer_Render
+	y:
+		db 0
 	height:
 		db Rasterizer_HEIGHT
 	image:
@@ -52,7 +54,7 @@ Rasterizer_Clear:
 	dec hl
 	ld bc,(Rasterizer_HEIGHT - 1) * 2
 	ldir
-	ld (ix + Renderable.y),0
+	ld (ix + Rasterizer.y),0
 	ld (ix + Rasterizer.height),Rasterizer_HEIGHT
 	ret
 
@@ -61,7 +63,6 @@ Rasterizer_Clear:
 ; iy = this
 ; Modifies: de
 Rasterizer_Add_IY:
-	ld e,(ix + Renderable.y)
 	ld d,0
 	push iy
 	add iy,de
@@ -99,8 +100,8 @@ Start:
 	dec (ix + Rasterizer.height)
 	ret z
 	call SpanBuffer_Init
-	ld e,(ix + Renderable.y)
-	inc (ix + Renderable.y)
+	ld e,(ix + Rasterizer.y)
+	inc (ix + Rasterizer.y)
 	ld d,0
 	push ix
 	add ix,de

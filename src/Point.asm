@@ -3,7 +3,6 @@
 ;
 Point: MACRO ?vertex, ?color
 	super: Renderable Point_Render
-	y: equ super.y
 	x:
 		db 0
 	z:
@@ -30,6 +29,7 @@ Point_Prepare: PROC
 	ld (ix + Point.y),d
 	ld (ix + Point.z),a
 	pop iy
+	ld e,d
 	call Rasterizer_Add_IY
 	ret
 	ENDP

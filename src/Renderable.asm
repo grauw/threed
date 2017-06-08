@@ -10,8 +10,6 @@ Renderable: MACRO ?render, ?y = 0
 	render: equ $ - 2
 	next:
 		dw 0
-	y:
-		db ?y
 	ENDM
 
 ; hl = span buffer

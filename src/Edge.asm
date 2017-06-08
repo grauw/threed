@@ -3,8 +3,9 @@
 ;
 Edge: MACRO ?vertex1, ?vertex2, ?color
 	super: Renderable Edge_Render
-	y: equ super.y
 	x:
+		db 0
+	y:
 		db 0
 	z:
 		db 0
@@ -74,6 +75,7 @@ NoSwap:
 	ld (ix + Edge.super.render),Edge_Render & 0FFH
 	ld (ix + Edge.super.render + 1),Edge_Render >> 8
 	pop iy
+	ld e,h
 	call Rasterizer_Add_IY
 	ret
 Left:
@@ -89,6 +91,7 @@ Left:
 	ld (ix + Edge.super.render),Edge_RenderLeft & 0FFH
 	ld (ix + Edge.super.render + 1),Edge_RenderLeft >> 8
 	pop iy
+	ld e,h
 	call Rasterizer_Add_IY
 	ret
 	ENDP
