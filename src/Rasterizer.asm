@@ -56,41 +56,25 @@ Rasterizer_Clear:
 	ld (ix + Rasterizer.height),Rasterizer_HEIGHT
 	ret
 
-; bc = renderable count
-; de = renderable size
-; iy = renderables
-; ix = this
-Rasterizer_AddArray: PROC
-Loop:
-	ex de,hl
-	call Rasterizer_Add
-	ex de,hl
-	add iy,de
-	dec bc
-	ld a,b
-	or c
-	jr nz,Loop
-	ret
-	ENDP
-
-; iy = renderable
-; ix = this
+; e = y
+; ix = renderable
+; iy = this
 ; Modifies: de
-Rasterizer_Add:
-	ld e,(iy + Renderable.y)
+Rasterizer_Add_IY:
+	ld e,(ix + Renderable.y)
 	ld d,0
-	push ix
-	add ix,de
-	add ix,de
-	ld e,(ix + Rasterizer.buckets)
-	ld d,(ix + Rasterizer.buckets + 1)
-	ld (iy + Renderable.next),e
-	ld (iy + Renderable.next + 1),d
-	ld e,iyl
-	ld d,iyh
-	ld (ix + Rasterizer.buckets),e
-	ld (ix + Rasterizer.buckets + 1),d
-	pop ix
+	push iy
+	add iy,de
+	add iy,de
+	ld e,(iy + Rasterizer.buckets)
+	ld d,(iy + Rasterizer.buckets + 1)
+	ld (ix + Renderable.next),e
+	ld (ix + Renderable.next + 1),d
+	ld e,ixl
+	ld d,ixh
+	ld (iy + Rasterizer.buckets),e
+	ld (iy + Rasterizer.buckets + 1),d
+	pop iy
 	ret
 
 ; ix = this

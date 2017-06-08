@@ -27,8 +27,10 @@ Edge: MACRO ?vertex1, ?vertex2, ?color
 	_size:
 	ENDM
 
+; iy = rasterizer
 ; ix = this
 Edge_Prepare: PROC
+	push iy
 	ld c,(ix + Edge.vertex1)
 	ld b,(ix + Edge.vertex1 + 1)
 	ld iyl,c
@@ -71,6 +73,8 @@ NoSwap:
 	ld (ix + Edge.error),a
 	ld (ix + Edge.super.render),Edge_Render & 0FFH
 	ld (ix + Edge.super.render + 1),Edge_Render >> 8
+	pop iy
+	call Rasterizer_Add_IY
 	ret
 Left:
 	neg
@@ -84,10 +88,13 @@ Left:
 	ld (ix + Edge.error),a
 	ld (ix + Edge.super.render),Edge_RenderLeft & 0FFH
 	ld (ix + Edge.super.render + 1),Edge_RenderLeft >> 8
+	pop iy
+	call Rasterizer_Add_IY
 	ret
 	ENDP
 
 ; bc = count
+; iy = rasterizer
 ; ix = this
 Edge_PrepareArray: PROC
 Loop:

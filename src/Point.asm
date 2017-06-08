@@ -15,8 +15,10 @@ Point: MACRO ?vertex, ?color
 	_size:
 	ENDM
 
+; iy = rasterizer
 ; ix = this
 Point_Prepare: PROC
+	push iy
 	ld e,(ix + Point.vertex)
 	ld d,(ix + Point.vertex + 1)
 	ld iyl,e
@@ -27,10 +29,13 @@ Point_Prepare: PROC
 	ld (ix + Point.x),e
 	ld (ix + Point.y),d
 	ld (ix + Point.z),a
+	pop iy
+	call Rasterizer_Add_IY
 	ret
 	ENDP
 
 ; bc = count
+; iy = rasterizer
 ; ix = this
 Point_PrepareArray: PROC
 Loop:

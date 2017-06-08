@@ -56,6 +56,15 @@ Application_GetRasterizer:
 	ret
 
 ; ix = this
+; iy <- rasterizer
+Application_GetRasterizer_IY:
+	ld e,ixl
+	ld d,ixh
+	ld iy,Application.rasterizer
+	add iy,de
+	ret
+
+; ix = this
 ; ix <- image
 Application_GetImage:
 	ld e,(ix + Application.image)
@@ -222,45 +231,24 @@ Application_Draw:
 	pop ix
 
 	push ix
+	call Application_GetRasterizer_IY
 	ld ix,Application_points
 	ld bc,Application_points_COUNT
 	call Point_PrepareArray
 	pop ix
 
 	push ix
+	call Application_GetRasterizer_IY
 	ld ix,Application_edges
 	ld bc,Application_edges_COUNT
 	call Edge_PrepareArray
 	pop ix
 
 	push ix
+	call Application_GetRasterizer_IY
 	ld ix,Application_faces
 	ld bc,Application_faces_COUNT
 	call Face_PrepareArray
-	pop ix
-
-	push ix
-	call Application_GetRasterizer
-	ld iy,Application_faces
-	ld bc,Application_faces_COUNT
-	ld de,Face._size
-	call Rasterizer_AddArray
-	pop ix
-
-	push ix
-	call Application_GetRasterizer
-	ld iy,Application_edges
-	ld bc,Application_edges_COUNT
-	ld de,Edge._size
-	call Rasterizer_AddArray
-	pop ix
-
-	push ix
-	call Application_GetRasterizer
-	ld iy,Application_points
-	ld bc,Application_points_COUNT
-	ld de,Point._size
-	call Rasterizer_AddArray
 	pop ix
 
 	push ix
