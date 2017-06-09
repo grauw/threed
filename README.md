@@ -21,4 +21,3 @@ System Requirements
   * MSX turboR
   * 128kB video RAM
   * 64kB main RAM
-  * 64kB Konami 4/5 ROM
