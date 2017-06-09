@@ -42,6 +42,7 @@ COM_Main:
 	INCLUDE "SpanBuffer.asm"
 	INCLUDE "Renderable.asm"
 	INCLUDE "Rasterizer.asm"
+	INCLUDE "Material.asm"
 	INCLUDE "Point.asm"
 	INCLUDE "Edge.asm"
 	INCLUDE "Face.asm"

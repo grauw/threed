@@ -1,14 +1,14 @@
 ;
 ; A point
 ;
-Point: MACRO ?vertex, ?color
+Point: MACRO ?vertex, ?material
 	super: Renderable Point_Render
 	x:
 		db 0
 	z:
 		db 0
-	color:
-		db ?color
+	material:
+		dw ?material
 	vertex:
 		dw ?vertex * Vector4._size
 	_size:
@@ -78,9 +78,12 @@ Loop:
 ; iy = this
 Point_Render:
 	ld d,(ix + Point.x)
-	ld e,d
-	inc e
 	ld b,(ix + Point.z)
-	ld c,(ix + Point.color)
-	call SpanBuffer_Insert
+	push ix
+	ld a,(ix + Point.material)
+	ld c,(ix + Point.material + 1)
+	ld ixl,a
+	ld ixh,c
+	call Material_RenderPoint
+	pop ix
 	jp Renderable_Next

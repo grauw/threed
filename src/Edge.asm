@@ -1,7 +1,7 @@
 ;
 ; An edge
 ;
-Edge: MACRO ?vertex1, ?vertex2, ?color
+Edge: MACRO ?vertex1, ?vertex2, ?material
 	super: Renderable Edge_Render
 	x:
 		db 0
@@ -17,8 +17,8 @@ Edge: MACRO ?vertex1, ?vertex2, ?color
 		db 0
 	error:
 		db 0
-	color:
-		db ?color
+	material:
+		dw ?material
 	vertex1:
 		dw ?vertex1 * Vector4._size
 	vertex2:
@@ -148,11 +148,14 @@ Loop:
 ; iy = this
 Edge_Render: PROC
 	ld d,(ix + Edge.x)
-	ld e,d
-	inc e
 	ld b,(ix + Edge.z)
-	ld c,(ix + Edge.color)
-	call SpanBuffer_Insert
+	push ix
+	ld a,(ix + Edge.material)
+	ld c,(ix + Edge.material + 1)
+	ld ixl,a
+	ld ixh,c
+	call Material_RenderPoint
+	pop ix
 	ld a,(ix + Edge.x)
 	add a,(ix + Edge.stepx)
 	ld c,a
@@ -173,11 +176,14 @@ NoOverflow:
 ; iy = this
 Edge_RenderLeft: PROC
 	ld d,(ix + Edge.x)
-	ld e,d
-	inc e
 	ld b,(ix + Edge.z)
-	ld c,(ix + Edge.color)
-	call SpanBuffer_Insert
+	push ix
+	ld a,(ix + Edge.material)
+	ld c,(ix + Edge.material + 1)
+	ld ixl,a
+	ld ixh,c
+	call Material_RenderPoint
+	pop ix
 	ld a,(ix + Edge.x)
 	sub (ix + Edge.stepx)
 	ld c,a

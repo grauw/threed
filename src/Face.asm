@@ -1,10 +1,10 @@
 ;
 ;
 ;
-Face: MACRO ?vertex1, ?vertex2, ?vertex3, ?color
+Face: MACRO ?vertex1, ?vertex2, ?vertex3, ?material
 	super: Renderable Face_Render
-	color:
-		db ?color
+	material:
+		dw ?material
 	vertex1:
 		dw ?vertex1 * Vector4._size
 	vertex2:

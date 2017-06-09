@@ -299,52 +299,52 @@ Application_vertices:
 Application_vertices_COUNT: equ 8
 
 Application_points:
-	Point 0, 99H
-	Point 1, 99H
-	Point 2, 99H
-	Point 3, 99H
-	Point 4, 0BBH
-	Point 5, 0BBH
-	Point 6, 0BBH
-	Point 7, 0BBH
+	Point 0, Material_lightRed
+	Point 1, Material_lightRed
+	Point 2, Material_lightRed
+	Point 3, Material_lightRed
+	Point 4, Material_lightYellow
+	Point 5, Material_lightYellow
+	Point 6, Material_lightYellow
+	Point 7, Material_lightYellow
 
 Application_points_COUNT: equ 8
 
 Application_edges:
-	Edge 0, 1, 55H
-	Edge 1, 2, 55H
-	Edge 2, 3, 55H
-	Edge 3, 0, 55H
-	Edge 0, 2, 55H
-	Edge 0, 4, 88H
-	Edge 1, 5, 88H
-	Edge 2, 6, 88H
-	Edge 3, 7, 88H
-	Edge 0, 5, 88H
-	Edge 1, 6, 88H
-	Edge 2, 7, 88H
-	Edge 3, 4, 88H
-	Edge 4, 5, 0CCH
-	Edge 5, 6, 0CCH
-	Edge 6, 7, 0CCH
-	Edge 7, 4, 0CCH
-	Edge 5, 7, 0CCH
+	Edge 0, 1, Material_blue
+	Edge 1, 2, Material_blue
+	Edge 2, 3, Material_blue
+	Edge 3, 0, Material_blue
+	Edge 0, 2, Material_blue
+	Edge 0, 4, Material_red
+	Edge 1, 5, Material_red
+	Edge 2, 6, Material_red
+	Edge 3, 7, Material_red
+	Edge 0, 5, Material_red
+	Edge 1, 6, Material_red
+	Edge 2, 7, Material_red
+	Edge 3, 4, Material_red
+	Edge 4, 5, Material_green
+	Edge 5, 6, Material_green
+	Edge 6, 7, Material_green
+	Edge 7, 4, Material_green
+	Edge 5, 7, Material_green
 
 Application_edges_COUNT: equ 18
 
 Application_faces:
-	Face 0, 4, 7, 8
-	Face 0, 7, 3, 8
-	Face 0, 1, 5, 8
-	Face 0, 5, 4, 8
-	Face 6, 5, 1, 8
-	Face 6, 1, 2, 8
-	Face 6, 2, 3, 8
-	Face 6, 3, 7, 8
-	Face 0, 1, 2, 5
-	Face 0, 2, 3, 5
-	Face 6, 5, 4, 12
-	Face 6, 4, 7, 12
+	Face 0, 4, 7, Material_red
+	Face 0, 7, 3, Material_red
+	Face 0, 1, 5, Material_red
+	Face 0, 5, 4, Material_red
+	Face 6, 5, 1, Material_red
+	Face 6, 1, 2, Material_red
+	Face 6, 2, 3, Material_red
+	Face 6, 3, 7, Material_red
+	Face 0, 1, 2, Material_blue
+	Face 0, 2, 3, Material_blue
+	Face 6, 5, 4, Material_green
+	Face 6, 4, 7, Material_green
 
 Application_faces_COUNT: equ 12
 
