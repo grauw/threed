@@ -96,12 +96,12 @@ Face_Render: PROC
 	bit 0,(ix + Face.hasX)
 	jr nz,HasX
 	set 0,(ix + Face.hasX)
-	ld (ix + Face.x),d
+	ld (ix + Face.x),e
 	ld (ix + Face.z),b
 	ret
 HasX:
 	res 0,(ix + Face.hasX)
-	ld e,(ix + Face.x)
+	ld d,(ix + Face.x)
 	ld a,(ix + Face.z)
 	add a,b
 	rr a

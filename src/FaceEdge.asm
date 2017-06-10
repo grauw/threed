@@ -178,19 +178,19 @@ NoOverflow:
 ; hl = span buffer (l is insignificant, assumed 0)
 ; iy = this
 FaceEdge_RenderLeft: PROC
-	ld d,(ix + FaceEdge.x)
+	ld e,(ix + FaceEdge.x)
 	ld b,(ix + FaceEdge.z)
-	ld a,d
+	ld a,e
 	sub (ix + FaceEdge.stepx)
-	ld e,a
+	ld d,a
 	ld a,(ix + FaceEdge.error)
 	add a,(ix + FaceEdge.dx)
 	jr nc,NoOverflow
-	dec e
+	dec d
 	sub (ix + FaceEdge.dy)
 NoOverflow:
 	ld (ix + FaceEdge.error),a
-	ld (ix + FaceEdge.x),e
+	ld (ix + FaceEdge.x),d
 	push ix
 	ld a,(ix + FaceEdge.face)
 	ld c,(ix + FaceEdge.face + 1)
