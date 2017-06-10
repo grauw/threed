@@ -5,9 +5,10 @@
 ;     http://tfpsly.free.fr/Docs/TomHammersley/sbuffer.htm
 ;
 ; It is using a linked list approach, however to avoid needing a span allocation
-; mechanism, it puts spans in 256 buckets, one for each pixel. Furthermore, to
-; speed up traversing the spans list, the span fields are placed in three
-; aligned arrays rather than one array of span objects.
+; mechanism, it puts spans in 256 buckets, one for each pixel. To speed up
+; traversing the spans list, the span fields are placed in three aligned arrays
+; rather than one array of span objects. Also the buckets are shifted left by 1,
+; (so x 0 is in bucket 255) to avoid special-casing end x 0 (=100H).
 ;
 SpanBuffer: MACRO
 	IF ($ & 0FFH) != 0
@@ -24,13 +25,15 @@ SpanBuffer: MACRO
 ; hl = this
 ; hl <- this
 SpanBuffer_Init:
-	ld (hl),0
+	dec l
+	ld (hl),255
 	inc h
 	ld (hl),0FFH
 	inc h
 	ld (hl),0
 	dec h
 	dec h
+	inc l
 	ret
 
 ; d = x
@@ -38,24 +41,24 @@ SpanBuffer_Init:
 ; b = z
 ; c = color
 ; hl = this
-; Modifies: af
+; Modifies: af, d, e
 SpanBuffer_Insert: PROC
+	dec e
 	ld a,e
-	dec a
 	cp d
 	call c,System_ThrowException
 	push bc
-	xor a
+	dec d
+	ld a,255
+	cp d
+	jr z,StartNoSplit
 StartLoop:
 	ld l,a
 	ld a,(hl)
-	and a
-	jr z,StartLoopBreak
 	cp d
 	jr c,StartLoop
-StartLoopBreak:
-	cp d
 	jr z,StartNoSplit
+StartSplit:
 	ld a,(hl)
 	ld (hl),d
 	inc h
@@ -73,12 +76,8 @@ StartNoSplit:
 EndLoop:
 	ld l,a
 	ld a,(hl)
-	and a
-	jr z,EndLoopBreak
 	cp e
 	jr c,EndLoop
-EndLoopBreak:
-	cp e
 	jr z,EndNoSplit
 EndSplit:
 	ld a,(hl)
