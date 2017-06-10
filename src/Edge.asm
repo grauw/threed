@@ -149,7 +149,7 @@ Loop:
 Edge_Render: PROC
 	ld d,(ix + Edge.x)
 	ld b,(ix + Edge.z)
-	ld a,(ix + Edge.x)
+	ld a,d
 	add a,(ix + Edge.stepx)
 	ld e,a
 	ld a,(ix + Edge.error)
@@ -177,7 +177,7 @@ NoOverflow:
 Edge_RenderLeft: PROC
 	ld d,(ix + Edge.x)
 	ld b,(ix + Edge.z)
-	ld a,(ix + Edge.x)
+	ld a,d
 	sub (ix + Edge.stepx)
 	ld e,a
 	ld a,(ix + Edge.error)

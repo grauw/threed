@@ -152,7 +152,7 @@ Loop:
 FaceEdge_Render: PROC
 	ld d,(ix + FaceEdge.x)
 	ld b,(ix + FaceEdge.z)
-	ld a,(ix + FaceEdge.x)
+	ld a,d
 	add a,(ix + FaceEdge.stepx)
 	ld e,a
 	ld a,(ix + FaceEdge.error)
@@ -180,7 +180,7 @@ NoOverflow:
 FaceEdge_RenderLeft: PROC
 	ld d,(ix + FaceEdge.x)
 	ld b,(ix + FaceEdge.z)
-	ld a,(ix + FaceEdge.x)
+	ld a,d
 	sub (ix + FaceEdge.stepx)
 	ld e,a
 	ld a,(ix + FaceEdge.error)
