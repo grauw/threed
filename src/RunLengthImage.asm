@@ -81,18 +81,15 @@ RunLengthImage_PlotSpanBuffer: PROC
 Loop:
 	ld a,(hl)
 	sub l
-	inc h
-	inc h
 	ld (de),a
 	inc de
-	ld a,(hl)
-	dec h
-	dec h
-	ld (de),a
-	inc de
-	ld l,(hl)
-	inc l
-	dec l
+	inc h
+	ld c,h
+	inc h
+	add a,l
+	ldi
+	ld h,c
+	ld l,a
 	jr nz,Loop
 	ld (ix + RunLengthImage.spansEnd),e
 	ld (ix + RunLengthImage.spansEnd + 1),d
