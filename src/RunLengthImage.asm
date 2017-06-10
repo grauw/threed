@@ -6,8 +6,8 @@ RunLengthImage_HEIGHT: equ 212
 RunLengthImage: MACRO
 	page:
 		db 0
-	spanCount:
-		dw RunLengthImage_HEIGHT
+	spansEnd:
+		dw spans + RunLengthImage_HEIGHT * RunLengthSpan._size
 	spans:
 		ds 800H * 2  ; RunLengthSpan._size
 	ENDM
@@ -30,16 +30,32 @@ RunLengthImage_GetSpans:
 	ret
 
 ; ix = this
+; hl <- spans
+; de <- spans count
+RunLengthImage_GetSpansAndCount:
+	ld e,ixl
+	ld d,ixh
+	ld hl,RunLengthImage.spans
+	add hl,de
+	ex de,hl
+	ld l,(ix + RunLengthImage.spansEnd)
+	ld h,(ix + RunLengthImage.spansEnd + 1)
+	sbc hl,de
+	ex de,hl
+	srl d
+	rr e
+	ret
+
+; ix = this
 RunLengthImage_Clear:
-	ld (ix + RunLengthImage.spanCount),0
-	ld (ix + RunLengthImage.spanCount + 1),0
+	call RunLengthImage_GetSpans
+	ld (ix + RunLengthImage.spansEnd),l
+	ld (ix + RunLengthImage.spansEnd + 1),h
 	ret
 
 ; a = page
 ; ix = this
 RunLengthImage_ClearBlack:
-	ld (ix + RunLengthImage.spanCount),RunLengthImage_HEIGHT
-	ld (ix + RunLengthImage.spanCount + 1),0
 	call RunLengthImage_GetSpans
 	ld e,l
 	ld d,h
@@ -47,6 +63,8 @@ RunLengthImage_ClearBlack:
 	ld bc,RunLengthImage_HEIGHT * RunLengthSpan._size - 1
 	ld (hl),0
 	call System_FastLDIR
+	ld (ix + RunLengthImage.spansEnd),e
+	ld (ix + RunLengthImage.spansEnd + 1),d
 	ret
 
 ; a = page
@@ -58,16 +76,8 @@ RunLengthImage_SetPage:
 ; hl = span buffer
 ; ix = this
 RunLengthImage_PlotSpanBuffer: PROC
-	ex de,hl
-	ld c,ixl
-	ld b,ixh
-	ld hl,RunLengthImage.spans
-	add hl,bc
-	ld c,(ix + RunLengthImage.spanCount)
-	ld b,(ix + RunLengthImage.spanCount + 1)
-	add hl,bc
-	add hl,bc
-	ex de,hl
+	ld e,(ix + RunLengthImage.spansEnd)
+	ld d,(ix + RunLengthImage.spansEnd + 1)
 Loop:
 	ld a,(hl)
 	sub l
@@ -80,13 +90,12 @@ Loop:
 	dec h
 	ld (de),a
 	inc de
-	inc bc
 	ld l,(hl)
 	inc l
 	dec l
 	jr nz,Loop
-	ld (ix + RunLengthImage.spanCount),c
-	ld (ix + RunLengthImage.spanCount + 1),b
+	ld (ix + RunLengthImage.spansEnd),e
+	ld (ix + RunLengthImage.spansEnd + 1),d
 	ret
 	ENDP
 
@@ -97,14 +106,10 @@ RunLengthImage_Draw8Bpp: PROC
 	ld hl,0
 	ld a,(ix + RunLengthImage.page)
 	call VDP_SetWriteAddress
-	call RunLengthImage_GetSpans
-	ld c,(ix + RunLengthImage.spanCount)
-	ld b,(ix + RunLengthImage.spanCount + 1)
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld e,c
-	ld d,b
+	call RunLengthImage_GetSpansAndCount
+	dec de  ; 16-bit to 2x 8-bit loop
+	inc d
+	inc e
 Loop:
 	ld b,(hl)
 	inc hl
@@ -127,14 +132,10 @@ RunLengthImage_Draw4Bpp: PROC
 	srl a
 	rr h
 	call VDP_SetWriteAddress
-	call RunLengthImage_GetSpans
-	ld c,(ix + RunLengthImage.spanCount)
-	ld b,(ix + RunLengthImage.spanCount + 1)
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld e,c
-	ld d,b
+	call RunLengthImage_GetSpansAndCount
+	dec de  ; 16-bit to 2x 8-bit loop
+	inc d
+	inc e
 EvenXLoop:
 	ld b,(hl)
 	inc hl
@@ -186,10 +187,9 @@ OddXNext:
 ; iy = other image
 ; ix = this
 RunLengthImage_DrawDelta:
-	ld c,(ix + RunLengthImage.spanCount)
-	ld b,(ix + RunLengthImage.spanCount + 1)
-	ld a,b
-	or c
+	call RunLengthImage_GetSpansAndCount
+	ld a,d
+	or e
 	ret z
 	exx
 	ld e,(ix + RunLengthImage.page)
@@ -202,27 +202,27 @@ RunLengthImage_DrawDelta:
 	ld hl,0C000H
 	ENDIF
 	exx
-	ld de,RunLengthImage.spans
-	add ix,de
-	add iy,de
+	ld bc,RunLengthImage.spans
+	add ix,bc
+	add iy,bc
 	call RunLengthImage_DrawDeltaSpans
 	ret
 
-; bc = span count
+; de = span count
 ; ix = spans
 ; iy = other spans
 ; e' = screen page
 ; hl' = x/y position
 RunLengthImage_DrawDeltaSpans: PROC
+	dec de  ; 16-bit to 2x 8-bit loop
+	inc d
+	inc e
+	ld a,d
+	ld b,e
 	ld l,(ix + RunLengthSpan.length)
 	ld h,(ix + RunLengthSpan.color)
 	ld e,(iy + RunLengthSpan.length)
 	ld d,(iy + RunLengthSpan.color)
-	dec bc  ; 16-bit to 2x 8-bit loop
-	inc b
-	inc c
-	ld a,b
-	ld b,c
 OuterLoop:
 	push af
 Loop:
