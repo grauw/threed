@@ -46,11 +46,14 @@ SpanBuffer_Insert: PROC
 	ld a,e
 	cp d
 	call c,System_ThrowException
-	push bc
 	dec d
 	ld a,255
 	cp d
 	jr z,StartNoSplit
+
+; a = x
+; d = span x
+; e = span end x
 StartLoop:
 	ld l,a
 	ld a,(hl)
@@ -58,6 +61,12 @@ StartLoop:
 	jr c,StartLoop
 	jr z,StartNoSplit
 StartSplit:
+	inc h
+	ld a,(hl)
+	dec h
+	cp b
+	jr c,CullLoopFromFill
+	push bc
 	ld a,(hl)
 	ld (hl),d
 	inc h
@@ -70,17 +79,41 @@ StartSplit:
 	ld (hl),b
 	dec h
 	ld (hl),a
-	ld a,d
+	pop bc
+	jr FillLoopFromStart
 StartNoSplit:
-EndLoop:
 	ld l,a
+	inc h
 	ld a,(hl)
+	dec h
+	cp b
+	jr c,CullLoopFromFill
+	jr FillLoopFromCull
+
+; l = fill start x
+; e = end x
+CullToFill:
+	ld d,l
+	jr FillLoopFromCull
+
+; a = x
+; d = fill start x
+; e = end x
+FillLoop:
+	ld l,a
+	inc h
+	ld a,(hl)
+	dec h
+	cp b
+	jr c,FillToCull
+FillLoopFromCull:
+	ld a,(hl)
+FillLoopFromStart:
 	cp e
-	jr c,EndLoop
-	jr z,EndNoSplit
-EndSplit:
-	ld a,(hl)
-	ld (hl),e
+	jr c,FillLoop
+	jr z,FillEndNoSplit
+FillEndSplit:
+	push bc
 	inc h
 	ld b,(hl)
 	inc h
@@ -91,24 +124,47 @@ EndSplit:
 	ld (hl),b
 	dec h
 	ld (hl),a
-EndNoSplit:
 	pop bc
-	ld a,d
-FillLoop:
-	ld l,a
+FillEndNoSplit:
+	ld l,d
+	ld (hl),e
 	inc h
-	ld a,(hl)
-	cp b
-	jr c,FillLoopNext
 	ld (hl),b
 	inc h
 	ld (hl),c
 	dec h
-FillLoopNext:
 	dec h
+	ret
+
+; d = fill start x
+; l = fill end x
+; e = end x
+FillToCull:
+	ld a,l
+	ld l,d
+	ld (hl),a
+	inc h
+	ld (hl),b
+	inc h
+	ld (hl),c
+	dec h
+	dec h
+	ld l,a
+	jr CullLoopFromFill
+
+; a = x
+; e = end x
+CullLoop:
+	ld l,a
+	inc h
+	ld a,(hl)
+	dec h
+	cp b
+	jr nc,CullToFill
+CullLoopFromFill:
 	ld a,(hl)
 	cp e
-	jr nz,FillLoop
+	jr c,CullLoop
 	ret
 	ENDP
 
