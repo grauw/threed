@@ -152,6 +152,17 @@ Loop:
 FaceEdge_Render: PROC
 	ld d,(ix + FaceEdge.x)
 	ld b,(ix + FaceEdge.z)
+	ld a,(ix + FaceEdge.x)
+	add a,(ix + FaceEdge.stepx)
+	ld e,a
+	ld a,(ix + FaceEdge.error)
+	add a,(ix + FaceEdge.dx)
+	jr nc,NoOverflow
+	inc e
+	sub (ix + FaceEdge.dy)
+NoOverflow:
+	ld (ix + FaceEdge.error),a
+	ld (ix + FaceEdge.x),e
 	push ix
 	ld a,(ix + FaceEdge.face)
 	ld c,(ix + FaceEdge.face + 1)
@@ -159,17 +170,6 @@ FaceEdge_Render: PROC
 	ld ixh,c
 	call Face_Render
 	pop ix
-	ld a,(ix + FaceEdge.x)
-	add a,(ix + FaceEdge.stepx)
-	ld c,a
-	ld a,(ix + FaceEdge.error)
-	add a,(ix + FaceEdge.dx)
-	jr nc,NoOverflow
-	inc c
-	sub (ix + FaceEdge.dy)
-NoOverflow:
-	ld (ix + FaceEdge.error),a
-	ld (ix + FaceEdge.x),c
 	dec (ix + FaceEdge.height)
 	jp nz,Renderable_Advance
 	jp Renderable_Next
@@ -180,6 +180,17 @@ NoOverflow:
 FaceEdge_RenderLeft: PROC
 	ld d,(ix + FaceEdge.x)
 	ld b,(ix + FaceEdge.z)
+	ld a,(ix + FaceEdge.x)
+	sub (ix + FaceEdge.stepx)
+	ld e,a
+	ld a,(ix + FaceEdge.error)
+	add a,(ix + FaceEdge.dx)
+	jr nc,NoOverflow
+	dec e
+	sub (ix + FaceEdge.dy)
+NoOverflow:
+	ld (ix + FaceEdge.error),a
+	ld (ix + FaceEdge.x),e
 	push ix
 	ld a,(ix + FaceEdge.face)
 	ld c,(ix + FaceEdge.face + 1)
@@ -187,17 +198,6 @@ FaceEdge_RenderLeft: PROC
 	ld ixh,c
 	call Face_Render
 	pop ix
-	ld a,(ix + FaceEdge.x)
-	sub (ix + FaceEdge.stepx)
-	ld c,a
-	ld a,(ix + FaceEdge.error)
-	add a,(ix + FaceEdge.dx)
-	jr nc,NoOverflow
-	dec c
-	sub (ix + FaceEdge.dy)
-NoOverflow:
-	ld (ix + FaceEdge.error),a
-	ld (ix + FaceEdge.x),c
 	dec (ix + FaceEdge.height)
 	jp nz,Renderable_Advance
 	jp Renderable_Next

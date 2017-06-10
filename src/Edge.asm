@@ -149,6 +149,17 @@ Loop:
 Edge_Render: PROC
 	ld d,(ix + Edge.x)
 	ld b,(ix + Edge.z)
+	ld a,(ix + Edge.x)
+	add a,(ix + Edge.stepx)
+	ld e,a
+	ld a,(ix + Edge.error)
+	add a,(ix + Edge.dx)
+	jr nc,NoOverflow
+	inc e
+	sub (ix + Edge.dy)
+NoOverflow:
+	ld (ix + Edge.error),a
+	ld (ix + Edge.x),e
 	push ix
 	ld a,(ix + Edge.material)
 	ld c,(ix + Edge.material + 1)
@@ -156,17 +167,6 @@ Edge_Render: PROC
 	ld ixh,c
 	call Material_RenderPoint
 	pop ix
-	ld a,(ix + Edge.x)
-	add a,(ix + Edge.stepx)
-	ld c,a
-	ld a,(ix + Edge.error)
-	add a,(ix + Edge.dx)
-	jr nc,NoOverflow
-	inc c
-	sub (ix + Edge.dy)
-NoOverflow:
-	ld (ix + Edge.error),a
-	ld (ix + Edge.x),c
 	dec (ix + Edge.height)
 	jp nz,Renderable_Advance
 	jp Renderable_Next
@@ -177,6 +177,17 @@ NoOverflow:
 Edge_RenderLeft: PROC
 	ld d,(ix + Edge.x)
 	ld b,(ix + Edge.z)
+	ld a,(ix + Edge.x)
+	sub (ix + Edge.stepx)
+	ld e,a
+	ld a,(ix + Edge.error)
+	add a,(ix + Edge.dx)
+	jr nc,NoOverflow
+	dec e
+	sub (ix + Edge.dy)
+NoOverflow:
+	ld (ix + Edge.error),a
+	ld (ix + Edge.x),e
 	push ix
 	ld a,(ix + Edge.material)
 	ld c,(ix + Edge.material + 1)
@@ -184,17 +195,6 @@ Edge_RenderLeft: PROC
 	ld ixh,c
 	call Material_RenderPoint
 	pop ix
-	ld a,(ix + Edge.x)
-	sub (ix + Edge.stepx)
-	ld c,a
-	ld a,(ix + Edge.error)
-	add a,(ix + Edge.dx)
-	jr nc,NoOverflow
-	dec c
-	sub (ix + Edge.dy)
-NoOverflow:
-	ld (ix + Edge.error),a
-	ld (ix + Edge.x),c
 	dec (ix + Edge.height)
 	jp nz,Renderable_Advance
 	jp Renderable_Next
