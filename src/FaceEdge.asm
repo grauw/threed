@@ -1,6 +1,10 @@
 ;
 ; A face edge
 ;
+; Using Bresenham’s Run-Slice algorithm
+; See Michael Abrash’s Graphics Programming Black Book chapter 36
+; http://downloads.gamedev.net/pdf/gpbb/gpbb36.pdf
+;
 FaceEdge: MACRO ?vertex1, ?vertex2, ?face
 	super: Renderable FaceEdge_Render
 	x:

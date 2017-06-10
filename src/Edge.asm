@@ -1,6 +1,10 @@
 ;
 ; An edge
 ;
+; Using Bresenham’s Run-Slice algorithm
+; See Michael Abrash’s Graphics Programming Black Book chapter 36
+; http://downloads.gamedev.net/pdf/gpbb/gpbb36.pdf
+;
 Edge: MACRO ?vertex1, ?vertex2, ?material
 	super: Renderable Edge_Render
 	x:
