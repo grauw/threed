@@ -108,6 +108,7 @@ HasX:
 	ld b,a
 	ld a,e
 	cp d
+	ret z
 	jr nc,NoSwap
 	ld e,d
 	ld d,a
