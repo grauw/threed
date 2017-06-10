@@ -73,11 +73,12 @@ RunLengthImage_SetPage:
 	ld (ix + RunLengthImage.page),a
 	ret
 
-; hl = span buffer
+; h = span buffer
 ; ix = this
 RunLengthImage_PlotSpanBuffer: PROC
 	ld e,(ix + RunLengthImage.spansEnd)
 	ld d,(ix + RunLengthImage.spansEnd + 1)
+	ld l,0
 Loop:
 	dec l
 	ld a,(hl)

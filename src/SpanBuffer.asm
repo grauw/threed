@@ -22,10 +22,10 @@ SpanBuffer: MACRO
 		ds 100H
 	ENDM
 
-; hl = this
-; hl <- this
+; h = this
+; h <- this
 SpanBuffer_Init:
-	dec l
+	ld l,-1
 	ld (hl),255
 	inc h
 	ld (hl),0FFH
@@ -33,14 +33,13 @@ SpanBuffer_Init:
 	ld (hl),0
 	dec h
 	dec h
-	inc l
 	ret
 
 ; d = x
 ; e = end x
 ; b = z
 ; c = color
-; hl = this
+; h = this
 ; Modifies: af, d, e
 SpanBuffer_Insert: PROC
 	dec e
@@ -110,7 +109,6 @@ FillLoopNext:
 	ld a,(hl)
 	cp e
 	jr nz,FillLoop
-	ld l,0
 	ret
 	ENDP
 
