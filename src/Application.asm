@@ -234,14 +234,14 @@ Application_Draw:
 	call Application_GetRasterizer_IY
 	ld ix,Application_points
 	ld bc,Application_points_COUNT
-	call Point_PrepareArray
+;	call Point_PrepareArray
 	pop ix
 
 	push ix
 	call Application_GetRasterizer_IY
 	ld ix,Application_edges
 	ld bc,Application_edges_COUNT
-	call Edge_PrepareArray
+;	call Edge_PrepareArray
 	pop ix
 
 	push ix

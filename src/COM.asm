@@ -46,5 +46,6 @@ COM_Main:
 	INCLUDE "Point.asm"
 	INCLUDE "Edge.asm"
 	INCLUDE "Face.asm"
+	INCLUDE "FaceEdge.asm"
 
 	ENDS
