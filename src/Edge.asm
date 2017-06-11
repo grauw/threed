@@ -105,10 +105,8 @@ Loop:
 	push bc
 	call Edge_Prepare
 	pop bc
-	ex de,hl
 	ld de,Edge._size
 	add ix,de
-	ex de,hl
 	dec bc
 	ld a,b
 	or c

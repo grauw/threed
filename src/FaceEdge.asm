@@ -108,10 +108,8 @@ Loop:
 	push bc
 	call FaceEdge_Prepare
 	pop bc
-	ex de,hl
 	ld de,FaceEdge._size
 	add ix,de
-	ex de,hl
 	dec bc
 	ld a,b
 	or c
