@@ -28,6 +28,20 @@ ScaleMatrix4x4: MACRO ?x = 0, ?y = 0, ?z = 0
 	Matrix4x4 ?x, 0, 0, 0, 0, ?y, 0, 0, 0, 0, ?z, 0, 0, 0, 0, 100H
 	ENDM
 
+OrthographicMatrix4x4: MACRO ?aspect = 100H, ?fovtan = 100H, ?near = 100H, ?far = 500H
+	Matrix4x4 100H * ?aspect / ?fovtan, 0, 0, 0,
+	          0, 10000H / ?fovtan, 0, 0,
+	          0, 0, 10000H / (?far - ?near), -100H * ?near / (?far - ?near),
+	          0, 0, 0, 100H
+	ENDM
+
+PerspectiveMatrix4x4: MACRO ?aspect = 100H, ?fovtan = 100H, ?near = 100H, ?far = 500H
+	Matrix4x4 100H * ?aspect / ?fovtan, 0, 0, 0,
+	          0, 10000H / ?fovtan, 0, 0,
+	          0, 0, 100H * ?far / (?far - ?near), -?far * ?near / (?far - ?near),
+	          0, 0, 100H, 0
+	ENDM
+
 ; iy = matrix
 ; ix = this
 Matrix4x4_Multiply:

@@ -360,14 +360,11 @@ Application_model:
 Application_view:
 	Matrix4x4  100H,    0H,    0H,    0H,
 	             0H,  100H,    0H,    0H,
-	             0H,    0H,  100H,  200H,
+	             0H,    0H,  100H,  300H,
 	             0H,    0H,    0H,  100H
 
 Application_projection:
-	Matrix4x4  100H,    0H,    0H,    0H,
-	             0H,  100H,    0H,    0H,
-	             0H,    0H,  100H,    0H,
-	             0H,    0H,  100H,  100H
+	PerspectiveMatrix4x4 100H, 100H, 100H, 500H
 
 Application_mvp:
 	IdentityMatrix4x4
