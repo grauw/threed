@@ -65,22 +65,15 @@ NoSwap:
 	ld a,e
 	sub l
 	jr c,Left
-	ld e,a
-	call Math_Divide8x8
-	ld (ix + FaceEdge.stepx),a
-	ld (ix + FaceEdge.dx),b
-	xor a
-	srl c
-	sbc a,c
-	ld (ix + FaceEdge.error),a
+Right:
 	ld (ix + FaceEdge.super.render),FaceEdge_Render & 0FFH
 	ld (ix + FaceEdge.super.render + 1),FaceEdge_Render >> 8
-	pop iy
-	ld e,h
-	call Rasterizer_Add_IY
-	ret
+	jr Continue
 Left:
 	neg
+	ld (ix + FaceEdge.super.render),FaceEdge_RenderLeft & 0FFH
+	ld (ix + FaceEdge.super.render + 1),FaceEdge_RenderLeft >> 8
+Continue:
 	ld e,a
 	call Math_Divide8x8
 	ld (ix + FaceEdge.stepx),a
@@ -89,8 +82,6 @@ Left:
 	srl c
 	sbc a,c
 	ld (ix + FaceEdge.error),a
-	ld (ix + FaceEdge.super.render),FaceEdge_RenderLeft & 0FFH
-	ld (ix + FaceEdge.super.render + 1),FaceEdge_RenderLeft >> 8
 	pop iy
 	ld e,h
 	call Rasterizer_Add_IY

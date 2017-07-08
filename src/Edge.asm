@@ -65,22 +65,15 @@ NoSwap:
 	ld a,e
 	sub l
 	jr c,Left
-	ld e,a
-	call Math_Divide8x8
-	ld (ix + Edge.stepx),a
-	ld (ix + Edge.dx),b
-	xor a
-	srl c
-	sbc a,c
-	ld (ix + Edge.error),a
+Right:
 	ld (ix + Edge.super.render),Edge_Render & 0FFH
 	ld (ix + Edge.super.render + 1),Edge_Render >> 8
-	pop iy
-	ld e,h
-	call Rasterizer_Add_IY
-	ret
+	jr Continue
 Left:
 	neg
+	ld (ix + Edge.super.render),Edge_RenderLeft & 0FFH
+	ld (ix + Edge.super.render + 1),Edge_RenderLeft >> 8
+Continue:
 	ld e,a
 	call Math_Divide8x8
 	ld (ix + Edge.stepx),a
@@ -89,8 +82,6 @@ Left:
 	srl c
 	sbc a,c
 	ld (ix + Edge.error),a
-	ld (ix + Edge.super.render),Edge_RenderLeft & 0FFH
-	ld (ix + Edge.super.render + 1),Edge_RenderLeft >> 8
 	pop iy
 	ld e,h
 	call Rasterizer_Add_IY
