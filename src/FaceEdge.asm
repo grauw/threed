@@ -74,10 +74,23 @@ Left:
 	ld (ix + FaceEdge.super.render),FaceEdge_RenderLeft & 0FFH
 	ld (ix + FaceEdge.super.render + 1),FaceEdge_RenderLeft >> 8
 Continue:
+	cp c
+	jr z,XYEqual
+	jr nc,XMajor
+YMajor:
+	ld (ix + FaceEdge.stepx),0
+	ld (ix + FaceEdge.dx),a
+	jr Continue2
+XYEqual:
+	ld (ix + FaceEdge.stepx),1
+	ld (ix + FaceEdge.dx),0
+	jr Continue2
+XMajor:
 	ld e,a
 	call Math_Divide8x8
 	ld (ix + FaceEdge.stepx),a
 	ld (ix + FaceEdge.dx),b
+Continue2:
 	xor a
 	srl c
 	sbc a,c

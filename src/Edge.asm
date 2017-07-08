@@ -74,10 +74,23 @@ Left:
 	ld (ix + Edge.super.render),Edge_RenderLeft & 0FFH
 	ld (ix + Edge.super.render + 1),Edge_RenderLeft >> 8
 Continue:
+	cp c
+	jr z,XYEqual
+	jr nc,XMajor
+YMajor:
+	ld (ix + Edge.stepx),0
+	ld (ix + Edge.dx),a
+	jr Continue2
+XYEqual:
+	ld (ix + Edge.stepx),1
+	ld (ix + Edge.dx),0
+	jr Continue2
+XMajor:
 	ld e,a
 	call Math_Divide8x8
 	ld (ix + Edge.stepx),a
 	ld (ix + Edge.dx),b
+Continue2:
 	xor a
 	srl c
 	sbc a,c
