@@ -22,15 +22,16 @@ SpanBuffer: MACRO
 		ds 100H
 	ENDM
 
+; a = clear colour
 ; h = this
 ; h <- this
-SpanBuffer_Init:
+SpanBuffer_Clear:
 	ld l,-1
 	ld (hl),255
 	inc h
 	ld (hl),0FFH
 	inc h
-	ld (hl),0
+	ld (hl),a
 	dec h
 	dec h
 	ret

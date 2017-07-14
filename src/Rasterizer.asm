@@ -99,7 +99,8 @@ Rasterizer_Render: PROC
 Start:
 	dec (ix + Rasterizer.height)
 	ret z
-	call SpanBuffer_Init
+	xor a
+	call SpanBuffer_Clear
 	ld e,(ix + Rasterizer.y)
 	inc (ix + Rasterizer.y)
 	ld d,0
