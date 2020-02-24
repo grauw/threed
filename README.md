@@ -9,7 +9,7 @@ Project information
 3D rendering engine
 
   * Author: Laurens Holst <laurens@grauw.nl>
-  * Source: <https://bitbucket.org/grauw/threed>
+  * Source: <https://hg.sr.ht/~grauw/threed>
   * License: Simplified BSD License
 
 Coordinate system is left-handed, with positive x pointing right, positive y
