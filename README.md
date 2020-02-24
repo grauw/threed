@@ -8,16 +8,17 @@ Project information
 
 3D rendering engine
 
-Author: Laurens Holst <laurens.nospam@grauw.nl>  
-Site: <https://bitbucket.org/grauw/threed>  
+  * Author: Laurens Holst <laurens@grauw.nl>
+  * Source: <https://bitbucket.org/grauw/threed>
+  * License: Simplified BSD License
 
 Coordinate system is left-handed, with positive x pointing right, positive y
 pointing up and positive z pointing forward.
 
 
-System Requirements
+System requirements
 -------------------
 
   * MSX turboR
-  * 128kB video RAM
   * 64kB main RAM
+  * 128kB video RAM
