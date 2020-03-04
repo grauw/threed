@@ -21,11 +21,12 @@ Application_Main:
 	cp 2
 	ret c
 
-	IF R800
-	call System_EnableTurbo
-	ELSE
-	call System_DisableTurbo
-	ENDIF
+	ld hl,IDBYT2
+	call System_ReadBIOS
+	cp 3
+	ld a,R800 ? 10000001B : 10000000B
+	ld ix,CHGCPU
+	call nc,System_CallBIOS
 
 	call MemoryTest_Test
 
